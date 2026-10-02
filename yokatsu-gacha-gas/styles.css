@@ -27,9 +27,10 @@ body { min-width: 320px; min-height: 100vh; margin: 0; font-family: var(--body-f
   text-align: center;
 }
 .event__heading { position: relative; z-index: 1; display: flex; align-items: center; flex-direction: column; }
-.event__badge { display: block; width: min(100%,420px); height: auto; margin: -8px auto -8px; filter: drop-shadow(0 5px 9px rgba(20,17,82,.25)); }
-.event__lead { margin: 0 0 5px; color: #e7eeff; font-size: clamp(16px,4.2vw,21px); font-weight: 750; letter-spacing: .08em; }
-.event h1 { margin: 0; color: var(--cream); font-size: clamp(39px,11vw,56px); font-weight: 900; line-height: 1.15; letter-spacing: .04em; text-shadow: 0 3px 0 #332985, 0 7px 13px rgba(17,14,72,.42); }
+.event__badge { display: block; width: min(62%,250px); height: auto; margin: -5px auto -5px; filter: drop-shadow(0 4px 7px rgba(20,17,82,.25)); }
+.event__title { display: flex; align-items: center; flex-direction: column; gap: 1px; margin: 0; text-align: center; }
+.event__title-kicker { display: block; color: #ebe7ff; font-size: clamp(15px,3.9vw,19px); font-weight: 750; line-height: 1.2; letter-spacing: .07em; }
+.event__title-main { display: block; color: var(--cream); font-size: clamp(41px,11.2vw,58px); font-weight: 900; line-height: 1.12; letter-spacing: .03em; text-shadow: 0 2px 0 #332985, 0 6px 11px rgba(17,14,72,.38); }
 .machine { position: relative; width: min(76%,350px); margin: 7px auto -2px; animation: machine-float 3.8s ease-in-out infinite; }
 .machine img { display: block; width: 100%; height: auto; filter: drop-shadow(0 11px 15px rgba(17,15,80,.33)); }
 .machine.is-shaking { animation: machine-shake .16s ease-in-out infinite alternate; transform-origin: 50% 80%; }
