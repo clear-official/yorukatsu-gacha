@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#282e9e">
+  <meta name="description" content="水曜日限定の夜活ガチャ。今夜の運試しをしてみませんか？">
+  <title>夜活ガチャ｜夜活占い</title>
+  <link rel="preload" as="image" href="assets/images/background.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="page" data-app>
+    <div class="page__inner">
+      <header class="brand" aria-label="夜活占い 水曜日限定">
+        <img class="brand__logo" src="assets/images/yokatsu-logo.png" alt="夜活占い">
+        <img class="brand__badge" src="assets/images/wednesday-badge.png" alt="水曜日限定">
+      </header>
+
+      <section class="event" aria-labelledby="event-title">
+        <div class="event__heading">
+          <p class="event__lead">今夜の運試し、してみる？</p>
+          <h1 id="event-title">夜活ガチャ</h1>
+        </div>
+
+        <div class="machine" data-machine>
+          <img src="assets/images/gacha-machine.png" alt="カラフルなカプセルが入ったガチャポン">
+        </div>
+
+        <section class="card" aria-live="polite" aria-atomic="true">
+          <div class="view" data-view="loading">
+            <span class="spinner" aria-hidden="true"></span>
+            <p>今週の参加状況を確認しています…</p>
+          </div>
+
+          <div class="view" data-view="ready" hidden>
+            <p class="card__hint">100ptが当たるかも…？</p>
+            <button class="button" type="button" data-action="draw">
+              <span>ガチャを回す</span>
+            </button>
+            <p class="card__note">※今週のチャレンジは1回まで</p>
+          </div>
+
+          <div class="view" data-view="drawing" hidden>
+            <p class="card__hint">ガチャガチャ…</p>
+            <button class="button button--busy" type="button" disabled>
+              <span class="spinner spinner--small" aria-hidden="true"></span><span>抽選中</span>
+            </button>
+            <p class="card__note">そのまま少しお待ちください</p>
+          </div>
+
+          <div class="view" data-view="win" hidden>
+            <p class="result__eyebrow" data-participated hidden>今週は参加済みです</p>
+            <section class="result result--win">
+              <h2>あたり！</h2>
+              <p class="result__points">100ptプレゼント</p>
+              <p class="result__code" data-code></p>
+              <button class="button button--copy" type="button" data-action="copy">コードをコピー</button>
+              <p class="result__help">マイページのキャンペーンコード入力からお受け取りください</p>
+              <p class="result__next">また来週水曜日に🌙</p>
+            </section>
+          </div>
+
+          <div class="view" data-view="lose" hidden>
+            <p class="result__eyebrow" data-participated hidden>今週は参加済みです</p>
+            <section class="result">
+              <h2>今回は0pt…！</h2>
+              <p>また来週チャレンジしてね</p>
+              <p class="result__next">次回は来週水曜日🌙</p>
+            </section>
+          </div>
+
+          <div class="view" data-view="closed" hidden>
+            <section class="result">
+              <h2>今週のガチャは終了しました</h2>
+              <p>次回は水曜日に開催！</p>
+            </section>
+          </div>
+
+          <div class="view" data-view="unavailable" hidden>
+            <section class="result result--info">
+              <h2>ただいまご利用いただけません</h2>
+              <p>現在ガチャをご利用いただけません。時間をおいて再度お試しください。</p>
+              <button class="button button--secondary" type="button" data-action="retry">再度確認する</button>
+            </section>
+          </div>
+
+          <div class="view" data-view="error" hidden>
+            <section class="result result--info">
+              <h2>通信を確認してください</h2>
+              <p>結果を確認できませんでした。通信状態をご確認ください。</p>
+              <button class="button button--secondary" type="button" data-action="retry">参加状況を再確認する</button>
+            </section>
+          </div>
+        </section>
+        <p class="event__footnote">水曜日限定の夜活占い。今夜の運勢を、ひとつのカプセルに。</p>
+      </section>
+      <iframe class="gas-bridge" title="抽選サービスとの安全な通信" aria-hidden="true" tabindex="-1"></iframe>
+    </div>
+  </main>
+</body>
+</html>

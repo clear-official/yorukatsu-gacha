@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="yk-allowed-origin" content="<?= allowedOrigin ?>">
+  <meta charset="utf-8">
+</head>
+<body>
+<script>
+(function () {
+  'use strict';
+  var allowedOrigin = document.querySelector('meta[name="yk-allowed-origin"]').content;
+  if (!allowedOrigin || window.parent === window) return;
+
+  function reply(requestId, payload) {
+    window.parent.postMessage({ type: 'yokatsu-response', requestId: requestId, payload: payload }, allowedOrigin);
+  }
+
+  window.addEventListener('message', function (event) {
+    if (event.source !== window.parent || event.origin !== allowedOrigin) return;
+    var message = event.data;
+    if (!message || message.type !== 'yokatsu-request' || typeof message.requestId !== 'string') return;
+    if (message.action === 'status') {
+      google.script.run
+        .withSuccessHandler(function (response) { reply(message.requestId, response); })
+        .withFailureHandler(function () { reply(message.requestId, { ok: false, status: 'temporarily_unavailable' }); })
+        .statusApi(message.deviceId);
+    } else if (message.action === 'draw') {
+      google.script.run
+        .withSuccessHandler(function (response) { reply(message.requestId, response); })
+        .withFailureHandler(function () { reply(message.requestId, { ok: false, status: 'temporarily_unavailable' }); })
+        .drawApi(message.deviceId);
+    }
+  });
+  window.parent.postMessage({ type: 'yokatsu-ready' }, allowedOrigin);
+}());
+</script>
+</body>
+</html>
