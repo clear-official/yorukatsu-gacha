@@ -8,13 +8,40 @@
 
   var frame = root.querySelector('.gas-bridge');
   var machine = root.querySelector('[data-machine]');
+  var confetti = root.querySelector('[data-confetti]');
+  var confettiTimer = 0;
   var activeView = 'loading';
   var frameReady = false;
   var pending = new Map();
   var sequence = 0;
   var apiUrl = '';
 
+  function clearConfetti() {
+    window.clearTimeout(confettiTimer);
+    confetti.textContent = '';
+  }
+
+  function celebrateWin() {
+    clearConfetti();
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var colors = ['#f7659f', '#59bfff', '#ffe075', '#9a79ef'];
+    var pieces = document.createDocumentFragment();
+    for (var i = 0; i < 18; i++) {
+      var piece = document.createElement('span');
+      piece.className = 'confetti__piece';
+      piece.style.setProperty('--left', ((i * 37 + 13) % 94 + 3) + '%');
+      piece.style.setProperty('--color', colors[i % colors.length]);
+      piece.style.setProperty('--delay', ((i % 6) * 0.09) + 's');
+      piece.style.setProperty('--drift', (((i % 5) - 2) * 19) + 'px');
+      piece.style.setProperty('--spin', (i % 2 ? 540 : -540) + 'deg');
+      pieces.appendChild(piece);
+    }
+    confetti.appendChild(pieces);
+    confettiTimer = window.setTimeout(clearConfetti, 2900);
+  }
+
   function show(view) {
+    if (view !== 'win') clearConfetti();
     activeView = view;
     root.querySelectorAll('[data-view]').forEach(function (el) {
       el.hidden = el.getAttribute('data-view') !== view;
@@ -92,7 +119,9 @@
       if (Number(data.result) === 100 && !isWin) return show('unavailable');
       root.querySelectorAll('[data-participated]').forEach(function (label) { label.hidden = data.status !== 'already_played'; });
       if (isWin) root.querySelector('[data-code]').textContent = data.campaignCode;
-      return show(isWin ? 'win' : 'lose');
+      show(isWin ? 'win' : 'lose');
+      if (isWin && data.status === 'win') celebrateWin();
+      return;
     }
     return show('error');
   }
@@ -109,8 +138,9 @@
     if (activeView !== 'ready') return;
     show('drawing');
     machine.classList.add('is-shaking');
+    window.setTimeout(function () { machine.classList.remove('is-shaking'); }, 1200);
     // 結果はGASが保存・決定します。画面は演出時間の後に返却値だけを表示します。
-    Promise.all([callApi('draw'), wait(2300)]).then(function (values) {
+    Promise.all([callApi('draw'), wait(1700)]).then(function (values) {
       machine.classList.remove('is-shaking');
       applyResponse(values[0]);
     }).catch(function () {
@@ -134,7 +164,7 @@
     var field = document.createElement('textarea');
     field.value = code; field.readOnly = true; field.style.position = 'fixed'; field.style.opacity = '0';
     document.body.appendChild(field); field.select();
-    try { document.execCommand('copy'); button.textContent = 'コピーしました'; }
+    try { button.textContent = document.execCommand('copy') ? 'コピーしました' : 'コードを選択してコピーしてください'; }
     catch (e) { button.textContent = 'コードを選択してコピーしてください'; }
     document.body.removeChild(field);
   }

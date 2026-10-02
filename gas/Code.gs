@@ -28,10 +28,18 @@ var YK = Object.freeze({
   ],
 });
 
-/** Spreadsheet-bound script: prepare sheets once from the Apps Script editor. */
-function setupSheets() {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  if (!spreadsheet) throw new Error('スプレッドシートに紐づいたGASプロジェクトから実行してください。');
+/** Run once from the editor. A bound sheet is detected automatically; a standalone script uses SPREADSHEET_ID. */
+function setup() {
+  var properties = PropertiesService.getScriptProperties();
+  var spreadsheetId = String(properties.getProperty('SPREADSHEET_ID') || '').trim();
+  var active = SpreadsheetApp.getActiveSpreadsheet();
+  if (spreadsheetId && active && active.getId() !== spreadsheetId) {
+    throw new Error('SPREADSHEET_IDが、このGASに紐づくスプレッドシートと一致しません。プロジェクト設定のスクリプトプロパティを確認してください。');
+  }
+  if (!spreadsheetId && !active) {
+    throw new Error('スプレッドシートが見つかりません。紐づけ型GASから実行するか、プロジェクト設定のスクリプトプロパティにSPREADSHEET_IDを登録してください。');
+  }
+  var spreadsheet = spreadsheetId ? SpreadsheetApp.openById(spreadsheetId) : active;
 
   Object.keys(YK.HEADERS).forEach(function (name) {
     var sheet = spreadsheet.getSheetByName(name);
@@ -68,13 +76,19 @@ function setupSheets() {
     status.getRange('B5').setFormula('=IFERROR(VLOOKUP("test_mode",Settings!A:B,2,FALSE),"OFF")');
   }
 
-  PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', spreadsheet.getId());
   SpreadsheetApp.flush();
-  spreadsheet.toast('必要なシートを確認しました。既存の設定値と履歴は保持しています。', '夜活ガチャ', 6);
+  if (!spreadsheetId) properties.setProperty('SPREADSHEET_ID', spreadsheet.getId());
+  if (active) spreadsheet.toast('必要なシートを確認しました。既存の設定値と履歴は保持しています。', '夜活ガチャ', 6);
+  Logger.log('夜活ガチャ: シート構成を確認し、SPREADSHEET_IDを設定しました。');
+}
+
+/** Keep the old editor/menu entry point working for existing installations. */
+function setupSheets() {
+  return setup();
 }
 
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('夜活ガチャ').addItem('シート構成を確認・準備', 'setupSheets').addToUi();
+  SpreadsheetApp.getUi().createMenu('夜活ガチャ').addItem('初期設定・シート構成を確認', 'setup').addToUi();
 }
 
 /** The iframe bridge checks message origin before calling these methods. */
