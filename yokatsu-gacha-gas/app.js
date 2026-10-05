@@ -24,7 +24,7 @@
   function celebrateWin() {
     clearConfetti();
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var colors = ['#f7659f', '#59bfff', '#ffe075', '#9a79ef'];
+    var colors = ['#f4b7d3', '#a8daef', '#fff0ac', '#c3b3ef'];
     var pieces = document.createDocumentFragment();
     for (var i = 0; i < 18; i++) {
       var piece = document.createElement('span');
@@ -43,6 +43,8 @@
   function show(view) {
     if (view !== 'win') clearConfetti();
     activeView = view;
+    root.setAttribute('data-state', view);
+    root.querySelector('[data-action="draw"]').disabled = view !== 'ready';
     root.querySelectorAll('[data-view]').forEach(function (el) {
       el.hidden = el.getAttribute('data-view') !== view;
     });
