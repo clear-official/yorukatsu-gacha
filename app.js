@@ -12,6 +12,8 @@
   var confettiTimer = 0;
   var activeView = 'loading';
   var frameReady = false;
+  var bridgeWindow = null;
+  var bridgeOrigin = '';
   var pending = new Map();
   var sequence = 0;
   var apiUrl = '';
@@ -80,24 +82,28 @@
 
   function callApi(action) {
     return new Promise(function (resolve, reject) {
-      if (!frameReady) return reject(new Error('bridge_not_ready'));
+      if (!frameReady || !bridgeWindow) return reject(new Error('bridge_not_ready'));
       var id = 'yk-' + Date.now() + '-' + (++sequence);
       var timer = window.setTimeout(function () {
         pending.delete(id);
         reject(new Error('timeout'));
       }, 12000);
       pending.set(id, { resolve: resolve, reject: reject, timer: timer });
-      frame.contentWindow.postMessage({ type: 'yokatsu-request', requestId: id, action: action, deviceId: deviceId }, '*');
+      bridgeWindow.postMessage({ type: 'yokatsu-request', requestId: id, action: action, deviceId: deviceId }, bridgeOrigin);
     });
   }
 
   window.addEventListener('message', function (event) {
-    if (event.source !== frame.contentWindow || !event.data || typeof event.data !== 'object') return;
+    if (!event.data || typeof event.data !== 'object') return;
     if (event.data.type === 'yokatsu-ready') {
+      if (!/^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin)) return;
+      bridgeWindow = event.source;
+      bridgeOrigin = event.origin;
       frameReady = true;
       syncStatus();
       return;
     }
+    if (!bridgeWindow || event.source !== bridgeWindow || event.origin !== bridgeOrigin) return;
     if (event.data.type !== 'yokatsu-response' || typeof event.data.requestId !== 'string') return;
     var item = pending.get(event.data.requestId);
     if (!item) return;

@@ -10,14 +10,15 @@
 (function () {
   'use strict';
   var allowedOrigin = document.querySelector('meta[name="yk-allowed-origin"]').content;
-  if (!allowedOrigin || window.parent === window) return;
+  var hostWindow = window.top;
+  if (!allowedOrigin || hostWindow === window) return;
 
   function reply(requestId, payload) {
-    window.parent.postMessage({ type: 'yokatsu-response', requestId: requestId, payload: payload }, allowedOrigin);
+    hostWindow.postMessage({ type: 'yokatsu-response', requestId: requestId, payload: payload }, allowedOrigin);
   }
 
   window.addEventListener('message', function (event) {
-    if (event.source !== window.parent || event.origin !== allowedOrigin) return;
+    if (event.source !== hostWindow || event.origin !== allowedOrigin) return;
     var message = event.data;
     if (!message || message.type !== 'yokatsu-request' || typeof message.requestId !== 'string') return;
     if (message.action === 'status') {
@@ -32,7 +33,7 @@
         .drawApi(message.deviceId, message.requestId, message.campaignId || null);
     }
   });
-  window.parent.postMessage({ type: 'yokatsu-ready' }, allowedOrigin);
+  hostWindow.postMessage({ type: 'yokatsu-ready' }, allowedOrigin);
 }());
 </script>
 </body>
