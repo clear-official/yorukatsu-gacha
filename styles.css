@@ -131,7 +131,8 @@ button { -webkit-tap-highlight-color: transparent; }
 .win-decor--star-upper-right { top: 90px; right: 25px; width: clamp(19px, 5.2vw, 24px); animation-delay: -2.6s; }
 .win-decor--star-middle-left { top: 34%; left: 22px; width: clamp(20px, 5.5vw, 25px); animation-delay: -3.4s; }
 .win-decor--star-middle-right { top: 39%; right: 23px; width: clamp(22px, 6.3vw, 29px); animation-delay: -.5s; }
-.win-decor--star-lower-center { bottom: 18px; left: 48%; width: clamp(18px, 4.8vw, 22px); animation-delay: -1.9s; }
+.win-decor--star-lower-left { bottom: 28px; left: 28px; width: clamp(18px, 4.8vw, 22px); animation-delay: -1.9s; }
+.win-decor--star-lower-right { right: 31px; bottom: 48px; width: clamp(20px, 5.4vw, 25px); animation-delay: -3s; }
 .lose-decor { position: absolute; z-index: 0; display: block; height: auto; pointer-events: none; user-select: none; }
 .result--lose > :not(.lose-decor) { position: relative; z-index: 1; }
 .lose-decor--moon { top: 28px; left: clamp(88px, 25%, 116px); width: clamp(54px, 17vw, 76px); opacity: .92; animation: moon-sway 6.5s ease-in-out infinite; transform-origin: 50% 75%; }
