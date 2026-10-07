@@ -92,7 +92,7 @@ button { -webkit-tap-highlight-color: transparent; }
 @media (hover: hover) { .button--gacha:hover:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 2px 1px #ecf6ff99, inset 0 -3px 4px #6850ac55, 0 5px 0 #584296, 0 7px 12px #29205733; } }
 .button--gacha:active:not(:disabled) { transform: translateY(4px) scale(.98); box-shadow: inset 0 1px 1px #ecf6ff66, inset 0 -2px 3px #6850ac44, 0 2px 0 #584296, 0 3px 7px #29205726; }
 .button--gacha:disabled { opacity: 1; filter: brightness(.8) saturate(.85); }
-.button--copy, .button--secondary { min-height: 48px; font-size: 15px; }
+.button--secondary { min-height: 48px; font-size: 15px; }
 .button--secondary { margin-top: 17px; }
 .view[data-view="loading"], .result {
   padding: 21px 16px; border: 1px solid #e3e6fb66; border-radius: 25px;
@@ -113,10 +113,20 @@ button { -webkit-tap-highlight-color: transparent; }
 .result__eyebrow { margin: 0 0 9px !important; color: #e9e5fc; font-size: 12px; }
 .result__reward { border-top: 1px solid #989ac83b; padding-top: 12px; }
 .result__code-label { margin: 0 0 7px !important; color: #676087 !important; font-size: 12px !important; }
-.result__code { margin: 0 0 12px !important; padding: 11px 10px; border: 1px dashed #8982b799; border-radius: 12px; background: #f4f3ff66; color: #3d386d !important; font-size: 22px !important; font-weight: 850; letter-spacing: .04em; overflow-wrap: anywhere; user-select: all; }
+.result__code-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.result__code { flex: 1; margin: 0 !important; padding: 11px 10px; border: 1px dashed #8982b799; border-radius: 12px; background: #f4f3ff66; color: #3d386d !important; font-size: 22px !important; font-weight: 850; letter-spacing: .04em; overflow-wrap: anywhere; user-select: all; }
+.copy-icon { flex: 0 0 46px; width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid #8982b766; border-radius: 12px; background: #f4f3ff99; color: #554c8b; cursor: pointer; }
+.copy-icon svg { width: 23px; height: 23px; fill: currentColor; }
+.copy-icon:hover { background: #fff; }
+.copy-icon:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+.copy-icon.is-copied { color: #37836a; background: #e8fff6; }
+.result__copy-feedback { min-height: 18px; margin: 0 0 5px !important; color: #4b7b6d !important; font-size: 11px !important; font-weight: 700; }
+.button--claim { min-height: 48px; text-decoration: none; }
 .result__help { margin: 12px 0 0 !important; font-size: 11px !important; line-height: 1.6 !important; }
 .result__message { font-size: 18px !important; color: #625a8d !important; font-weight: 750; }
 .view[data-view="win"]:not([hidden]) .result, .view[data-view="lose"]:not([hidden]) .result { animation: result-appear .35s ease-out both; }
+[data-state="win"] .event__logo, [data-state="win"] .stage,
+[data-state="lose"] .event__logo, [data-state="lose"] .stage { display: none; }
 @keyframes result-appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .confetti { position: absolute; inset: 0; z-index: 3; overflow: hidden; border-radius: 25px; pointer-events: none; }
 .confetti__piece { position: absolute; top: -15px; left: var(--left); width: 7px; height: 11px; border-radius: 2px; background: var(--color); opacity: 0; animation: confetti-fall 2.25s var(--delay) ease-in forwards; }

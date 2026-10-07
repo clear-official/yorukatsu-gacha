@@ -162,7 +162,13 @@
   function copyCode(button) {
     var code = root.querySelector('[data-code]').textContent;
     if (!code) return;
-    var copied = function () { button.textContent = 'コピーしました'; };
+    var feedback = root.querySelector('[data-copy-feedback]');
+    var copied = function () {
+      button.setAttribute('aria-label', 'コピーしました');
+      button.setAttribute('title', 'コピーしました');
+      button.classList.add('is-copied');
+      if (feedback) feedback.textContent = 'コピーしました';
+    };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(code).then(copied).catch(function () { fallbackCopy(code, button); });
     } else fallbackCopy(code, button);
@@ -172,8 +178,15 @@
     var field = document.createElement('textarea');
     field.value = code; field.readOnly = true; field.style.position = 'fixed'; field.style.opacity = '0';
     document.body.appendChild(field); field.select();
-    try { button.textContent = document.execCommand('copy') ? 'コピーしました' : 'コードを選択してコピーしてください'; }
-    catch (e) { button.textContent = 'コードを選択してコピーしてください'; }
+    var feedback = root.querySelector('[data-copy-feedback]');
+    try {
+      if (document.execCommand('copy')) {
+        button.setAttribute('aria-label', 'コピーしました');
+        button.setAttribute('title', 'コピーしました');
+        button.classList.add('is-copied');
+        if (feedback) feedback.textContent = 'コピーしました';
+      } else if (feedback) feedback.textContent = 'コードを選択してコピーしてください';
+    } catch (e) { if (feedback) feedback.textContent = 'コードを選択してコピーしてください'; }
     document.body.removeChild(field);
   }
 
