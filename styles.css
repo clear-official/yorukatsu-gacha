@@ -127,6 +127,22 @@ button { -webkit-tap-highlight-color: transparent; }
 .view[data-view="win"]:not([hidden]) .result, .view[data-view="lose"]:not([hidden]) .result { animation: result-appear .35s ease-out both; }
 [data-state="win"] .event__logo, [data-state="win"] .stage,
 [data-state="lose"] .event__logo, [data-state="lose"] .stage { display: none; }
+.page[data-state="win"], .page[data-state="lose"] {
+  padding: calc(12px + env(safe-area-inset-top)) 8px calc(12px + env(safe-area-inset-bottom));
+}
+.page[data-state="win"] .page__inner, .page[data-state="lose"] .page__inner { width: min(100%, 560px); }
+.page[data-state="win"] .event, .page[data-state="lose"] .event {
+  min-height: calc(100svh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display: flex; align-items: center; padding: 14px; border-radius: 32px;
+}
+.page[data-state="win"] .card, .page[data-state="lose"] .card { width: 100%; }
+.page[data-state="win"] .result, .page[data-state="lose"] .result {
+  min-height: min(680px, calc(100svh - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(24px, 4.5vh, 38px) 20px;
+}
+.page[data-state="win"] .result__character { width: min(55%, 170px); max-height: 190px; }
+.page[data-state="lose"] .result__character { width: min(53%, 160px); max-height: 185px; }
 @keyframes result-appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .confetti { position: absolute; inset: 0; z-index: 3; overflow: hidden; border-radius: 25px; pointer-events: none; }
 .confetti__piece { position: absolute; top: -15px; left: var(--left); width: 7px; height: 11px; border-radius: 2px; background: var(--color); opacity: 0; animation: confetti-fall 2.25s var(--delay) ease-in forwards; }
@@ -136,8 +152,4 @@ button { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 390px) { .page { padding-right: 14px; padding-left: 14px; } .event { padding: 20px 18px 21px; border-radius: 32px; } }
 @media (min-width: 600px) { .page { padding-top: 40px; } .event { padding: 28px 32px; } .event__logo { width: 100%; margin: 0 auto 14px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .capsule-motion { display: none !important; } }
-/* Keep the reward in focus after the draw, while retaining the stage. */
-.page[data-state="win"] .machine, .page[data-state="lose"] .machine { width: min(52%, 165px); }
-.page[data-state="win"] .stage, .page[data-state="lose"] .stage { margin-bottom: 12px; padding-bottom: 9px; }
-.page[data-state="win"] .stage__floor, .page[data-state="lose"] .stage__floor { left: 23%; width: 54%; height: 31px; }
 @media (max-width: 599px) { .machine { width: min(86%, 290px); } }
