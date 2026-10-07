@@ -41,7 +41,7 @@
       pieces.appendChild(piece);
     }
     confetti.appendChild(pieces);
-    confettiTimer = window.setTimeout(clearConfetti, 2900);
+    confettiTimer = window.setTimeout(clearConfetti, 3400);
   }
 
   function show(view) {
