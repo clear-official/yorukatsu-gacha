@@ -126,16 +126,18 @@ button { -webkit-tap-highlight-color: transparent; }
 .result__message { font-size: 18px !important; color: #625a8d !important; font-weight: 750; }
 .lose-decor { position: absolute; z-index: 0; display: block; height: auto; pointer-events: none; user-select: none; }
 .result--lose > :not(.lose-decor) { position: relative; z-index: 1; }
-.lose-decor--moon { top: 24px; left: 18px; width: clamp(54px, 17vw, 76px); opacity: .92; animation: moon-sway 6.5s ease-in-out infinite; transform-origin: 50% 75%; }
+.lose-decor--moon { top: 28px; left: clamp(88px, 25%, 116px); width: clamp(54px, 17vw, 76px); opacity: .92; animation: moon-sway 6.5s ease-in-out infinite; transform-origin: 50% 75%; }
 .lose-decor--star { width: clamp(22px, 7vw, 32px); opacity: .75; animation: star-soft 4.2s ease-in-out infinite; }
 .lose-decor--star-upper-left { top: 132px; left: 24px; animation-delay: -1.4s; }
 .lose-decor--star-upper-right { top: 158px; right: 28px; width: clamp(17px, 5.5vw, 25px); animation-delay: -2.8s; }
+.lose-decor--star-middle-left { top: 43%; left: 13%; width: clamp(17px, 5vw, 23px); animation-delay: -1.9s; }
+.lose-decor--star-middle-right { top: 46%; right: 12%; width: clamp(18px, 5.5vw, 25px); animation-delay: -3.1s; }
 .lose-decor--star-lower-left { bottom: 142px; left: 32px; width: clamp(16px, 5vw, 23px); animation-delay: -3.5s; }
 .lose-decor--star-lower-center { bottom: 58px; left: 47%; width: clamp(14px, 4.5vw, 21px); animation-delay: -.7s; }
 .lose-decor--star-lower-right { right: 34px; bottom: 118px; width: clamp(18px, 5.5vw, 25px); animation-delay: -2.1s; }
 .result__sleep-scene { position: relative; display: inline-block; }
 .result__sleep-scene .result__character { margin: 0 auto; }
-.lose-decor--zzz { position: absolute; z-index: 2; top: 14%; right: -25%; width: clamp(66px, 20vw, 86px); height: auto; opacity: .88; pointer-events: none; animation: zzz-float 4.8s ease-in-out infinite; }
+.lose-decor--zzz { position: absolute; z-index: 2; top: -10%; right: -42%; width: clamp(66px, 20vw, 86px); height: auto; opacity: .88; pointer-events: none; animation: zzz-float 4.8s ease-in-out infinite; }
 .result__sleep-message { margin: 4px 0 0 !important; color: #595382 !important; font-size: 15px !important; font-weight: 750; }
 .result--lose .result__message { margin-top: 8px !important; }
 @keyframes moon-sway { 0%,100% { transform: rotate(-2deg) translateY(0); } 50% { transform: rotate(2deg) translateY(-3px); } }
