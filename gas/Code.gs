@@ -36,7 +36,7 @@ function drawApi(deviceId, requestId, campaignId) {
 function doGet() {
   var template = HtmlService.createTemplateFromFile('Bridge');
   try {
-    template.allowedOrigin = readCampaign_(NG.DEFAULT_CAMPAIGN).allowedOrigin || '';
+    template.allowedOrigin = readAllowedOrigin_(NG.DEFAULT_CAMPAIGN);
   } catch (error) {
     template.allowedOrigin = '';
     console.error('Night Gacha bridge configuration: ' + safeError_(error));

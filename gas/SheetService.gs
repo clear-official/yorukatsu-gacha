@@ -71,6 +71,20 @@ function readCampaign_(campaignId) {
   return parseCampaign_(matches[0]);
 }
 
+/** iframeの接続許可だけを取得する。テスト中の時刻・確率設定には依存させない。 */
+function readAllowedOrigin_(campaignId) {
+  var id = validateCampaignId_(campaignId);
+  if (!id) throw new Error('キャンペーンIDが不正です。');
+  var sheet = requiredSheet_(configuredSpreadsheet_(), NG.CAMPAIGNS);
+  var matches = sheetRows_(sheet, true).filter(function (row) { return String(row[0]).trim() === id; });
+  if (matches.length !== 1) throw new Error('キャンペーン設定がないか重複しています。');
+  var origin = String(matches[0][11] || '').trim().replace(/\/$/, '');
+  if (!/^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(origin)) {
+    throw new Error('許可オリジンが不正です。');
+  }
+  return origin;
+}
+
 function readCode_(campaignId, eventDate) {
   var sheet = requiredSheet_(configuredSpreadsheet_(), NG.CODES);
   var rows = sheetRows_(sheet, true);

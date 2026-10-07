@@ -3,6 +3,8 @@
 
   // 公開WebアプリURLだけを設定します。確率・コード・抽選条件はGASに置きます。
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
+  var API_TIMEOUT_MS = 20000;
+  var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
   if (!root) return;
 
@@ -87,7 +89,7 @@
       var timer = window.setTimeout(function () {
         pending.delete(id);
         reject(new Error('timeout'));
-      }, 12000);
+      }, API_TIMEOUT_MS);
       pending.set(id, { resolve: resolve, reject: reject, timer: timer });
       bridgeWindow.postMessage({ type: 'yokatsu-request', requestId: id, action: action, deviceId: deviceId }, bridgeOrigin);
     });
@@ -202,5 +204,5 @@
   if (!configured()) { show('unavailable'); return; }
   apiUrl = GAS_WEB_APP_URL;
   frame.src = apiUrl;
-  window.setTimeout(function () { if (!frameReady) show('error'); }, 15000);
+  window.setTimeout(function () { if (!frameReady) show('error'); }, BRIDGE_READY_TIMEOUT_MS);
 }());

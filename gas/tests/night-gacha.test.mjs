@@ -124,6 +124,14 @@ test('disabled campaign, invalid ID, missing code and bad settings fail closed',
   assert.throws(() => c.statusFor_(deviceA, 'night-gacha', wed), /抽選設定/);
 });
 
+test('bridge origin remains available while draw settings are temporarily invalid', () => {
+  const { context: c, sheets } = fixture();
+  sheets['抽選設定'].rows[1][4] = '21:00';
+  sheets['抽選設定'].rows[1][5] = '11:30';
+  assert.throws(() => c.readCampaign_('night-gacha'), /抽選設定/);
+  assert.equal(c.readAllowedOrigin_('night-gacha'), 'https://clear-official.github.io');
+});
+
 test('a request ID cannot be reused by another user', () => {
   const { context: c, sheets } = fixture();
   c.drawFor_(deviceA, 'night-gacha', 'request-1', wed);
