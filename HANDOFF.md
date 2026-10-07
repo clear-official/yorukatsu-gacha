@@ -1,3 +1,7 @@
+# 更新メモ（新GAS構成）
+
+この文書は旧 Settings / CampaignCodes 構成の履歴です。現在作業中の未デプロイ版は gas/SETUP.md と SHEETS.md を参照してください。
+
 # 夜活ガチャ 引き継ぎ文
 
 このファイルと `yokatsu-gacha-gas.zip` を別端末へコピーしてください。ZIPを展開すれば、以下の相対パスでソースと手順書を参照できます。元のWindows上の絶対パスは別端末では使いません。

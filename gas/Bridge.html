@@ -24,12 +24,12 @@
       google.script.run
         .withSuccessHandler(function (response) { reply(message.requestId, response); })
         .withFailureHandler(function () { reply(message.requestId, { ok: false, status: 'temporarily_unavailable' }); })
-        .statusApi(message.deviceId);
+        .statusApi(message.deviceId, message.campaignId || null);
     } else if (message.action === 'draw') {
       google.script.run
         .withSuccessHandler(function (response) { reply(message.requestId, response); })
         .withFailureHandler(function () { reply(message.requestId, { ok: false, status: 'temporarily_unavailable' }); })
-        .drawApi(message.deviceId);
+        .drawApi(message.deviceId, message.requestId, message.campaignId || null);
     }
   });
   window.parent.postMessage({ type: 'yokatsu-ready' }, allowedOrigin);

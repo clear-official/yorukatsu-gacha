@@ -1,129 +1,45 @@
-# 夜活ガチャ（GitHub Pages + Google Apps Script）
+# 夜活ガチャ
 
-この一式はWordPressを使いません。GitHub Pagesは画面表示を担当し、曜日判定・抽選・参加履歴・当選コードはGoogle Apps Script（GAS）とGoogleスプレッドシートで管理します。
+GitHub Pagesの画面とGoogle Apps Script（GAS）・Googleスプレッドシートを組み合わせた、水曜日のガチャサイトです。WordPressは使用しません。
 
-## ファイル構成
+## 2026-10-05時点の状態
 
-- `index.html`、`styles.css`、`app.js`：GitHub Pagesへ置くフロント
-- `assets/images/`：完成ロゴ・ガチャ本体・当選／非当選用リアちゃん素材（旧素材も保管。元画像は無加工）
-- `gas/Code.gs`：抽選・状態確認・`setup()`によるシート初期設定
-- `gas/Bridge.html`：GASとGitHub Pagesをつなぐ、送信元チェック付きiframe
-- `gas/appsscript.json`：GASのタイムゾーンとWebアプリ設定
-- `SHEETS.md`：各シートの列と設定
-- `QA-NOTES.md`：確認済み項目と実環境での確認項目
-- `HANDOFF.md`：別端末・次の担当者向けの引き継ぎ文
+- GitHub Pagesのフロントは `index.html`、`styles.css`、`app.js`、`assets/images/` です。
+- フロントの表示と結果形式は、現時点では**水曜日・100pt当選／0pt非当選**に対応します。
+- `gas/` は、空の「夜活｜ガチャ抽選用シート」に合わせて作り直した**ローカルの未デプロイ版**です。`抽選設定`、`コード管理`、`ガチャ履歴` を使います。
+- GASへの認証済み接続、実シートへの作成、Apps Scriptへの貼付・デプロイ、実通信テストはまだ行っていません。
+- 公開中の `app.js` の `GAS_WEB_APP_URL` はプレースホルダーです。Webアプリの `/exec` URLを設定して公開するまで抽選は動きません。
 
-画面のタイトルは完成素材の「水曜日限定 夜活ガチャ」ロゴ画像1点です。通常画面はこのロゴと既存ガチャ本体を表示し、既存の夜空背景画像をページ全体に無加工で使用します。雲・星・青紫の奥行きを残し、薄いオーバーレイと半透明パネルで読みやすさを調整しています。追加の星・光粒・ステージの光とリング・ボタンはCSSで描画します。旧ロゴと旧バッジは画面で参照しません。結果画面には既存のリアちゃん素材を使う領域を設けています。
+## ファイル
 
-通常画面はロゴ → ガチャ本体 → ボタンの構成で、ボタン下の説明2行は表示しません。ガチャボタンは本体の紫・ラベンダー・水色と青白いハイライトに合わせた丸い質感に統一し、文字は白・20px・太字にしています。通常時は3pxの浮遊と2.2秒周期の控えめなボタンの光、抽選中は軽い揺れとカプセルの動きを表示します。当選時のみ淡い色の紙吹雪を表示し、約2.9秒で削除します。結果表示時はガチャ本体を縮小して結果を優先します。動きを減らす端末設定ではアニメーションを停止します。
-
-## 1. GitHub Pagesを準備する
-
-1. GitHubで新しいリポジトリを作ります（公開リポジトリがGitHub Pagesの一般的な設定です）。
-2. このフォルダー内の`index.html`、`styles.css`、`app.js`、`assets/`をリポジトリの公開元フォルダーへコピーします。`gas/`、README、QA記録も一緒に保存して構いませんが、ページ表示に必要なのは最初の4項目です。
-3. GitHubリポジトリの **Settings → Pages** で公開元ブランチとフォルダー（通常は`main` / `/ (root)`）を設定します。
-4. GitHub Pagesが示すURLを確認します。例：`https://ユーザー名.github.io/リポジトリ名/`。
-5. GASで使う許可オリジンはURLの`https://ユーザー名.github.io`部分です。リポジトリ名以降のパスは含めません。
-
-この成果物の作成者はGitHubへのpushや公開設定を行っていません。
-
-## 2. Googleスプレッドシートを準備する
-
-1. 新しいGoogleスプレッドシートを作成し、ファイルのタイムゾーンを **(GMT+09:00) Tokyo** にします。
-2. **拡張機能 → Apps Script** を開きます。スプレッドシートに紐づくGASプロジェクトが作られます。
-3. GASエディターの`Code.gs`を、このフォルダーの`gas/Code.gs`の内容で置き換えます。
-4. **＋ → HTML** で`Bridge`という名前のHTMLファイルを追加し、`gas/Bridge.html`の内容を貼り付けます（拡張子`.html`はエディターが付けます）。
-5. プロジェクト設定の「appsscript.json マニフェスト ファイルをエディタで表示する」を有効にし、`gas/appsscript.json`の内容をマニフェストへ反映します。既存のOAuthスコープがある場合は消さず、マージしてください。
-6. 関数一覧から`setup`を選び、**実行**します。初回はGoogleの権限確認に同意してください。
-7. スプレッドシートへ戻り、`Settings`、`CampaignCodes`、`Results`、`TestResults`、`Status`の5シートと各ヘッダーができたことを確認します。
-8. GASの **プロジェクトの設定 → スクリプト プロパティ** に`SPREADSHEET_ID`が保存されたことを確認します。紐づけ型GASでは`setup()`が開いているスプレッドシートのIDを自動取得するため、IDをコードに記入する必要はありません。
-
-単独型GASプロジェクトを使う場合は、`setup()`の実行前に **プロジェクトの設定 → スクリプト プロパティ → スクリプト プロパティを追加** で、プロパティ名を`SPREADSHEET_ID`、値を対象スプレッドシートのIDにして保存します。IDはスプレッドシートURLの`/spreadsheets/d/`と`/edit`の間の文字列です。その後`setup()`を実行してください。IDを`Code.gs`へ直書きしません。
-
-`setup()`は不足シート・ヘッダー・設定だけを追加し、既存の設定値と履歴を保持します。既存の見出しが想定と違う場合や、紐づけ型GASと保存済みIDが違う場合は、書き換えずにエラーで停止します。再実行しても既存データを初期化しません。以前の`setupSheets()`も`setup()`を呼び出します。
-
-## 3. シートを設定する
-
-`Settings`シートの初期値は以下です。設定値はGASがシートから読み込み、GitHub側には配置しません。
-
-| key | 初期値 | 用途 |
-|---|---:|---|
-| `win_probability` | `0.30` | 当選確率（0〜1） |
-| `weekly_winner_limit` | `100` | 週ごとの100pt上限（1〜100） |
-| `timezone` | `Asia/Tokyo` | 判定タイムゾーン |
-| `test_mode` | `OFF` | テストモード。通常は必ずOFF |
-| `test_result` | 空欄 | テスト時の固定結果。`100`、`0`、空欄 |
-| `test_campaign_code` | 空欄 | テスト当選用の無効なテストコード |
-| `allowed_origin` | `https://YOURNAME.github.io` | GitHub Pagesのオリジン |
-
-`allowed_origin`を、公開予定URLのオリジンへ変更してください。例：`https://acme.github.io`。末尾スラッシュやリポジトリ名は付けません。GASブリッジはこのオリジンからのメッセージだけを受け付けます。
-
-`CampaignCodes`へ1週につき1行で登録します。
-
-| week_id | campaign_code |
+| 場所 | 役割 |
 |---|---|
-| `2026-10-07` | `YK100A` |
-| `2026-10-14` | `YK100B` |
+| `index.html` / `styles.css` / `app.js` | GitHub Pagesの画面・通信 |
+| `assets/images/` | ロゴ、背景、ガチャ本体、結果画像 |
+| `gas/Code.gs` | GAS公開入口とロック |
+| `gas/Config.gs` | シート名・列名・内部ID |
+| `gas/SheetService.gs` | シート作成・読込・履歴保存 |
+| `gas/ValidationService.gs` | ID・日時・設定の検証 |
+| `gas/LotteryService.gs` | 開催判定・抽選・重複防止 |
+| `gas/Bridge.html` | GitHub PagesとGASのiframe通信 |
+| `gas/appsscript.json` | GASタイムゾーン・Webアプリ設定 |
+| `gas/tests/night-gacha.test.mjs` | シートを変更しないローカル模擬テスト |
+| `gas/SETUP.md` | 初回設定、デプロイ、テスト手順 |
+| `SHEETS.md` | 3シートの列構成 |
 
-- `week_id`は開催週の水曜日の日付です。日付は`YYYY-MM-DD`で入力し、水曜日である必要があります。
-- コード列は「書式 → 数字 → 書式なしテキスト」にしてから入力してください。先頭ゼロを保てます。
-- 同じ週の重複行や、他週と同じコードがある場合はGASが抽選を停止します。
-- `Status`シートは次回水曜日のweek_id、コード登録状態、テストモードを表示します。「未登録」や「重複・要確認」のまま本番運用しないでください。
+## 最初に行うこと
 
-`Results`は本番履歴、`TestResults`はテスト履歴です。どちらも列は`timestamp`、`week_id`、`device_id`、`result`、`campaign_code`です。氏名・メール・電話・IPアドレスは収集しません。
+1. [gas/SETUP.md](gas/SETUP.md) に従って、対象シートのApps ScriptへGASファイルを貼り付け、`setup()` を実行します。
+2. [SHEETS.md](SHEETS.md) の抽選設定と開催日ごとのコードを入力します。当選確率、開催時刻、当選上限、正式コードは運営側の決定が必要です。
+3. テスト用のシートコピーで検証し、本番のWebアプリをデプロイします。
+4. Webアプリの `/exec` URLを `app.js` の `GAS_WEB_APP_URL` に設定し、GitHub Pagesへ公開します。
 
-## 4. GASをWebアプリとしてデプロイする
+GASを実シートへ反映し、設定値とテスト結果を確認してから公開してください。
 
-1. GASエディター右上の **デプロイ → 新しいデプロイ** を選びます。
-2. 種類で **ウェブアプリ** を選択します。
-3. 実行ユーザーは **自分**、アクセスできるユーザーは **全員** にします。匿名アクセスを許可できないWorkspaceでは、この構成のままでは利用できません。
-4. デプロイを実行し、権限を確認します。
-5. 発行された`https://script.google.com/macros/s/.../exec` URLをコピーします。
+## 重要な制約
 
-この仕組みはGASのiframe内で`google.script.run`を呼び出すため、GitHub PagesからGASへ直接`fetch`する際に起きるCORS制約を避けます。ブリッジは`allowed_origin`と親ウィンドウの送信元を照合します。
+GASは開催条件・確率・当選上限・履歴を管理し、`LockService` で同時抽選を直列化します。ただし現在の「ユーザーID」はブラウザーの `localStorage` にある端末IDです。別端末やストレージ削除後の再参加を完全には防げません。iframeの送信元チェックも利用者の本人確認ではありません。正式なポイント付与前に運営側でこの制約を確認してください。
 
-## 5. GAS URLをフロントへ設定する
+新しいポイント額や別曜日のイベントに広げる場合は、GASの設定に加えてフロントの文言・結果判定も変更します。現行フロントは100pt以外の当選表示に対応していません。
 
-`app.js`冒頭の`GAS_WEB_APP_URL`を、デプロイした`/exec` URLに置き換えます。
-
-```js
-var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/デプロイID/exec';
-```
-
-当選確率・当選上限・キャンペーンコードはここへ書かないでください。GitHub PagesのJavaScriptは公開情報として誰でも閲覧できます。
-
-## 6. GitHub Pagesを公開する
-
-1. `index.html`、`styles.css`、`app.js`、`assets/`をGitHubリポジトリへ配置します。
-2. リポジトリの **Settings → Pages** で公開します。
-3. 公開URLを開き、イベントページが表示されることを確認します。
-4. GASの`Settings.allowed_origin`がページURLのオリジンと一致していることを確認します。
-
-この成果物はローカル作業物です。GitHubへのpush、GASの本番デプロイ、スプレッドシートの作成は利用者側で行います。
-
-## 7. テストモード
-
-本番の`Settings.test_mode`初期値は`OFF`です。テストするときだけ`ON`にし、必要に応じて`test_result`へ`100`または`0`を設定します。`100`を固定する場合は`test_campaign_code`に`TEST-DO-NOT-REDEEM`等の無効コードを設定してください。空欄ならGASの確率設定でテスト抽選します（コードが登録された週が必要です）。
-
-テスト結果は`TestResults`へ保存され、本番の上限・履歴には加算されません。テスト完了後は`test_mode`を`OFF`に戻し、`test_result`と`test_campaign_code`も空にしてください。URLパラメーターで本番の曜日制限を解除する機能はありません。
-
-## 8. GASを更新したとき
-
-1. Apps Scriptエディターの`Code.gs`または`Bridge.html`を更新します。
-2. **デプロイ → デプロイを管理** を開きます。
-3. 鉛筆アイコンから新しいバージョンを選び、デプロイします。
-4. 同じWebアプリURLを維持できているか確認します。URLが変わった場合は`app.js`も更新します。
-
-## 9. 本番公開前チェック
-
-- `test_mode`が`OFF`である。
-- `allowed_origin`とGitHub Pagesのオリジンが完全一致している。
-- `timezone`とスプレッドシートのタイムゾーンが日本時間になっている。
-- 今週以降の`CampaignCodes`が正しい水曜日の日付で登録され、コードが週ごとに異なる。
-- GAS Webアプリが「自分として実行」「全員アクセス」でデプロイされている。
-- 水曜日・木曜日、初回・再アクセス、コード未登録、連打/複数タブ、当選上限をステージングで確認する。
-- 375px、390px、414pxとアプリ内WebViewで横スクロール・文字切れ・コード表示崩れがない。
-
-## 制約
-
-deviceIdはブラウザーの`localStorage`に保存されます。ストレージ削除、シークレットモード、別ブラウザーや端末では別ユーザーとして扱われる可能性があります。ログインや個人情報を使った本人確認は行いません。
+従来の `HANDOFF.md` と `QA-NOTES.md` は旧シート構成を含む履歴資料です。新しいGASの設定は `gas/SETUP.md` と `SHEETS.md` を参照してください。

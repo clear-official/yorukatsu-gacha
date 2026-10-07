@@ -2,7 +2,7 @@
   'use strict';
 
   // 公開WebアプリURLだけを設定します。確率・コード・抽選条件はGASに置きます。
-  var GAS_WEB_APP_URL = 'PASTE_GAS_WEB_APP_EXEC_URL_HERE';
+  var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
   var root = document.querySelector('[data-app]');
   if (!root) return;
 
