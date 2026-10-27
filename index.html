@@ -20,14 +20,15 @@
   </script>
   <link rel="preload" as="image" href="assets/images/halloween-logo.png">
   <link rel="preload" as="image" href="assets/images/halloween-background.png">
-  <link rel="stylesheet" href="styles.css?v=20261027-3">
-  <script src="app.js?v=20261027-3" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261027-4">
+  <script src="app.js?v=20261027-4" defer></script>
 </head>
 <body>
   <main class="page" data-app>
     <div class="night-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><b></b><b></b></div>
     <div class="page__inner">
       <section class="event" aria-labelledby="event-title">
+        <p class="demo-banner" data-demo-only hidden>デモ表示：シート記録・ポイント付与なし</p>
         <h1 class="event__logo" id="event-title">
           <img src="assets/images/halloween-logo.png" alt="ハロウィン限定 夜活ガチャ" width="1672" height="941">
         </h1>
@@ -72,7 +73,7 @@
               <p class="result__points">20,000ptプレゼント✨</p>
               <div class="result__character-slot"><img class="result__character result__character--win" src="assets/images/halloween-ria-win.png" alt="ハロウィン衣装のリアちゃん" width="1672" height="941"></div>
               <div class="result__reward">
-                <p class="result__code-label">キャンペーンコード</p>
+                <p class="result__code-label" data-code-label>キャンペーンコード</p>
                 <div class="result__code-row">
                   <p class="result__code" data-code></p>
                   <button class="copy-icon" type="button" data-action="copy" aria-label="キャンペーンコードをコピー" title="キャンペーンコードをコピー">
@@ -80,7 +81,8 @@
                   </button>
                 </div>
                 <p class="result__copy-feedback" data-copy-feedback aria-live="polite"></p>
-                <a class="button button--claim" href="https://app-clear.com/open?act=campaign_code">ポイントを受け取る</a>
+                <a class="button button--claim" data-demo-block-claim href="https://app-clear.com/open?act=campaign_code">ポイントを受け取る</a>
+                <p class="result__demo-feedback" data-demo-claim-feedback aria-live="polite"></p>
                 <p class="result__help">遷移しない場合は、マイページのキャンペーンコード入力からも受け取りが可能です</p>
               </div>
             </section>

@@ -5,6 +5,8 @@
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
   var CAMPAIGN_ID = 'halloween-2026';
   var PRELAUNCH = true;
+  var DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
+  var DEMO_CODE = 'DEMO00';
   var API_TIMEOUT_MS = 20000;
   var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
@@ -56,9 +58,6 @@
     });
   }
 
-  // 見た目のみを先行公開。コード登録・GAS・シート設定の完了後に解除する。
-  if (PRELAUNCH) { show('closed'); return; }
-
   function getDeviceId() {
     var key = 'yokatsu_gacha_device_id';
     var id = '';
@@ -82,7 +81,7 @@
     return id.toLowerCase();
   }
 
-  var deviceId = getDeviceId();
+  var deviceId = DEMO_MODE ? '' : getDeviceId();
   function configured() {
     return /^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec(?:\?.*)?$/.test(GAS_WEB_APP_URL);
   }
@@ -101,6 +100,7 @@
   }
 
   window.addEventListener('message', function (event) {
+    if (DEMO_MODE || PRELAUNCH) return;
     if (!event.data || typeof event.data !== 'object') return;
     if (event.data.type === 'yokatsu-ready') {
       if (!/^https:\/\/(?:[a-z0-9-]+-)?script\.googleusercontent\.com$/i.test(event.origin)) return;
@@ -144,6 +144,7 @@
   }
 
   function syncStatus() {
+    if (DEMO_MODE) return show('ready');
     if (!configured() || !deviceId) return show('unavailable');
     show('loading');
     callApi('status').then(applyResponse).catch(function () { show('error'); });
@@ -157,12 +158,17 @@
     machine.classList.add('is-shaking');
     window.setTimeout(function () { machine.classList.remove('is-shaking'); }, 1200);
     // 結果はGASが保存・決定します。画面は演出時間の後に返却値だけを表示します。
-    Promise.all([callApi('draw'), wait(1700)]).then(function (values) {
+    // デモでは本番APIを呼ばず、画面上だけで当たりを再現する。
+    var result = DEMO_MODE
+      ? Promise.resolve({ ok: true, status: 'win', result: 20000, campaignCode: DEMO_CODE })
+      : callApi('draw');
+    Promise.all([result, wait(1700)]).then(function (values) {
       machine.classList.remove('is-shaking');
       applyResponse(values[0]);
     }).catch(function () {
       machine.classList.remove('is-shaking');
       show('error');
+      if (DEMO_MODE) return;
       // 通信結果が不明なときはstatusで保存済みの結果を復元する。画面で抽選し直さない。
       callApi('status').then(applyResponse).catch(function () { show('error'); });
     });
@@ -200,6 +206,11 @@
   }
 
   root.addEventListener('click', function (event) {
+    if (DEMO_MODE && event.target.closest('[data-demo-block-claim]')) {
+      event.preventDefault();
+      root.querySelector('[data-demo-claim-feedback]').textContent = 'デモのためアプリへは遷移しません';
+      return;
+    }
     var button = event.target.closest('[data-action]');
     if (!button) return;
     var action = button.getAttribute('data-action');
@@ -207,6 +218,17 @@
     if (action === 'retry') syncStatus();
     if (action === 'copy') copyCode(button);
   });
+
+  if (DEMO_MODE) {
+    root.setAttribute('data-demo', 'true');
+    root.querySelectorAll('[data-demo-only]').forEach(function (el) { el.hidden = false; });
+    root.querySelector('[data-code-label]').textContent = 'テスト用コード';
+    root.querySelector('[data-demo-block-claim]').setAttribute('href', '#');
+    show('ready');
+    return;
+  }
+  // コード登録・GAS・シート設定の完了までは通常アクセスの抽選を停止する。
+  if (PRELAUNCH) { show('closed'); return; }
 
   if (!configured()) { show('unavailable'); return; }
   apiUrl = GAS_WEB_APP_URL;

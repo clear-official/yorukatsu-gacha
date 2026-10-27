@@ -280,3 +280,14 @@ body { background: #1b0b3b; }
   .event__logo { margin-bottom: -3px; }
 }
 @media (min-width: 600px) { .event__logo { width: 100%; margin: -6px auto 1px; } }
+
+.demo-banner {
+  position: fixed; z-index: 10; top: calc(5px + env(safe-area-inset-top)); left: 50%;
+  width: max-content; max-width: calc(100vw - 20px); margin: 0; padding: 5px 11px;
+  transform: translateX(-50%); border: 1px solid #ffd779; border-radius: 999px;
+  background: #fff2cfee; box-shadow: 0 2px 9px #1e08317a;
+  color: #63236e; font-size: 11px; font-weight: 800; line-height: 1.25;
+  text-align: center;
+}
+.demo-banner[hidden] { display: none; }
+.result__demo-feedback { margin: 0 !important; font-size: 11px !important; font-weight: 750; }
