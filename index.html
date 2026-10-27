@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    if (matchMedia('(max-width: 599px)').matches && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+  </script>
   <meta name="theme-color" content="#220d45">
   <meta name="description" content="10月30日・31日限定の月夜のハロウィンガチャ。大当たりで20,000ptプレゼント！">
   <title>月夜のハロウィンガチャ</title>
@@ -20,8 +23,8 @@
   </script>
   <link rel="preload" as="image" href="assets/images/halloween-logo.png">
   <link rel="preload" as="image" href="assets/images/halloween-background.png">
-  <link rel="stylesheet" href="styles.css?v=20261027-12">
-  <script src="app.js?v=20261027-9" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261027-14">
+  <script src="app.js?v=20261027-10" defer></script>
 </head>
 <body>
   <svg class="filter-definitions" width="0" height="0" aria-hidden="true" focusable="false">
@@ -37,7 +40,7 @@
       <feMerge><feMergeNode in="sticker-shadow"/><feMergeNode in="sticker-border"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </svg>
-  <main class="page" data-app data-state="loading">
+  <main class="page is-booting" data-app data-state="loading">
     <div class="night-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><b></b><b></b></div>
     <div class="page__inner">
       <section class="event" aria-labelledby="event-title">

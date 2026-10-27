@@ -337,11 +337,15 @@ body { background: #1b0b3b; }
 @media (max-width: 599px) {
   .page { padding: 0 12px calc(12px + env(safe-area-inset-bottom)); }
   .page[data-state="win"], .page[data-state="lose"] { padding-top: 0; }
+  .page.is-booting:not([data-state="win"]):not([data-state="lose"]) {
+    height: 100vh; height: 100dvh; min-height: 0;
+  }
+  .page.is-booting .page__inner { visibility: hidden; }
   .page[data-state="loading"] .view[data-view="loading"] { min-height: 88px; padding: 12px 16px; }
   .page.is-fitted:not([data-state="win"]):not([data-state="lose"]) {
     display: flex; align-items: center; justify-content: center;
     height: 100vh; height: 100dvh; height: var(--viewport-height, 100dvh);
-    min-height: 0; padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    min-height: 0; padding: max(8px, calc(env(safe-area-inset-bottom) - 12px)) 12px;
   }
   .page.is-fitted:not([data-state="win"]):not([data-state="lose"]) .page__inner {
     flex: 0 0 auto; width: min(100%, 520px); height: var(--stage-height);

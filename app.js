@@ -12,7 +12,7 @@
   var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
   if (!root) return;
-  if (window.innerWidth < 600 && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (window.innerWidth < 600) window.scrollTo(0, 0);
 
   var frame = root.querySelector('.gas-bridge');
   var eventPanel = root.querySelector('.event');
@@ -30,10 +30,11 @@
   function fitGacha() {
     if (window.innerWidth >= 600 || activeView === 'win' || activeView === 'lose') {
       root.classList.remove('is-fitted');
+      root.classList.remove('is-booting');
       root.style.removeProperty('--viewport-height');
       return;
     }
-    var viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    var viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
     if (!viewportHeight) return;
     root.style.setProperty('--viewport-height', viewportHeight + 'px');
     root.classList.add('is-fitted');
@@ -44,6 +45,7 @@
     var scale = Math.min(1, Math.max(0, availableHeight / panelHeight));
     root.style.setProperty('--stage-scale', scale.toFixed(5));
     root.style.setProperty('--stage-height', (panelHeight * scale).toFixed(2) + 'px');
+    root.classList.remove('is-booting');
   }
 
   var fitQueued = false;
@@ -55,9 +57,12 @@
   window.addEventListener('resize', queueFit);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', queueFit);
   if (window.ResizeObserver) new ResizeObserver(queueFit).observe(eventPanel);
+  window.addEventListener('pagehide', function () {
+    if (window.innerWidth < 600 && activeView !== 'win' && activeView !== 'lose') root.classList.add('is-booting');
+  });
   window.addEventListener('pageshow', function () {
     if (activeView !== 'win' && activeView !== 'lose') window.scrollTo(0, 0);
-    queueFit();
+    fitGacha();
   });
 
   function clearConfetti() {
