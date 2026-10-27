@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#220d45">
-  <meta name="description" content="10月30日・31日限定のハロウィン夜活ガチャ。大当たりで20,000ptプレゼント！">
-  <title>ハロウィン限定 夜活ガチャ</title>
+  <meta name="description" content="10月30日・31日限定の月夜のハロウィンガチャ。大当たりで20,000ptプレゼント！">
+  <title>月夜のハロウィンガチャ</title>
   <link rel="preconnect" href="https://script.google.com">
   <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
   <link rel="dns-prefetch" href="//script.google.com">
@@ -20,8 +20,8 @@
   </script>
   <link rel="preload" as="image" href="assets/images/halloween-logo.png">
   <link rel="preload" as="image" href="assets/images/halloween-background.png">
-  <link rel="stylesheet" href="styles.css?v=20261027-4">
-  <script src="app.js?v=20261027-4" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20261027-5">
+  <script src="app.js?v=20261027-5" defer></script>
 </head>
 <body>
   <main class="page" data-app>
@@ -30,7 +30,7 @@
       <section class="event" aria-labelledby="event-title">
         <p class="demo-banner" data-demo-only hidden>デモ表示：シート記録・ポイント付与なし</p>
         <h1 class="event__logo" id="event-title">
-          <img src="assets/images/halloween-logo.png" alt="ハロウィン限定 夜活ガチャ" width="1672" height="941">
+          <img src="assets/images/halloween-logo.png" alt="月夜のハロウィンガチャ" width="1678" height="937">
         </h1>
         <div class="stage">
           <div class="stage__floor" aria-hidden="true"></div>
@@ -85,6 +85,17 @@
                 <p class="result__demo-feedback" data-demo-claim-feedback aria-live="polite"></p>
                 <p class="result__help">遷移しない場合は、マイページのキャンペーンコード入力からも受け取りが可能です</p>
               </div>
+            </section>
+          </div>
+
+          <div class="view" data-view="lose" hidden>
+            <p class="result__eyebrow" data-participated hidden>このイベントは参加済みです</p>
+            <section class="result result--lose">
+              <h2>ざんねん…</h2>
+              <div class="result__character-slot">
+                <img class="result__character result__character--lose" src="assets/images/halloween-ria-lose.png" alt="おばけ姿のリアちゃん" width="1003" height="1568">
+              </div>
+              <p class="result__lose-message">リアちゃんがいたずらして、<br>ポイントを隠されちゃった…💧</p>
             </section>
           </div>
 

@@ -5,7 +5,8 @@
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
   var CAMPAIGN_ID = 'halloween-2026';
   var PRELAUNCH = true;
-  var DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
+  var demoType = new URLSearchParams(window.location.search).get('demo');
+  var DEMO_MODE = demoType === '1' || demoType === 'lose';
   var DEMO_CODE = 'DEMO00';
   var API_TIMEOUT_MS = 20000;
   var BRIDGE_READY_TIMEOUT_MS = 20000;
@@ -130,13 +131,14 @@
     if (data.status === 'closed') return show('closed');
     if (data.status === 'temporarily_unavailable') return show('unavailable');
     if (data.status === 'win' || data.status === 'lose' || data.status === 'already_played') {
-      var isWin = Number(data.result) === 20000 &&
+      var isWin = data.status !== 'lose' && Number(data.result) === 20000 &&
         typeof data.campaignCode === 'string' && /^[A-Za-z0-9]{6}$/.test(data.campaignCode);
-      // この版は20,000ptの全員当選企画専用。想定外の結果を当たりとして見せない。
-      if (!isWin) return show('unavailable');
+      var isLose = data.status !== 'win' && Number(data.result) === 0 && !data.campaignCode;
+      // 本番設定では全員当選。想定外の応答は結果として見せない。
+      if (!isWin && !isLose) return show('unavailable');
       root.querySelectorAll('[data-participated]').forEach(function (label) { label.hidden = data.status !== 'already_played'; });
-      if (isWin) root.querySelector('[data-code]').textContent = data.campaignCode;
-      show('win');
+      root.querySelector('[data-code]').textContent = isWin ? data.campaignCode : '';
+      show(isWin ? 'win' : 'lose');
       if (isWin && data.status === 'win') celebrateWin();
       return;
     }
@@ -160,7 +162,9 @@
     // 結果はGASが保存・決定します。画面は演出時間の後に返却値だけを表示します。
     // デモでは本番APIを呼ばず、画面上だけで当たりを再現する。
     var result = DEMO_MODE
-      ? Promise.resolve({ ok: true, status: 'win', result: 20000, campaignCode: DEMO_CODE })
+      ? Promise.resolve(demoType === 'lose'
+        ? { ok: true, status: 'lose', result: 0 }
+        : { ok: true, status: 'win', result: 20000, campaignCode: DEMO_CODE })
       : callApi('draw');
     Promise.all([result, wait(1700)]).then(function (values) {
       machine.classList.remove('is-shaking');
