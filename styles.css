@@ -124,15 +124,15 @@ button { -webkit-tap-highlight-color: transparent; }
 .button--claim { min-height: 48px; text-decoration: none; }
 .result__help { margin: 12px 0 0 !important; font-size: 11px !important; line-height: 1.6 !important; }
 .result__message { font-size: 18px !important; color: #625a8d !important; font-weight: 750; }
-.win-decor { position: absolute; z-index: 0; display: block; height: auto; pointer-events: none; user-select: none; }
-.result--win > :not(.win-decor) { position: relative; z-index: 1; }
-.win-decor--star { width: clamp(21px, 6vw, 28px); opacity: .84; animation: win-star-soft 4.2s ease-in-out infinite; }
-.win-decor--star-upper-left { top: 40px; left: 25px; animation-delay: -1.1s; }
-.win-decor--star-upper-right { top: 90px; right: 25px; width: clamp(19px, 5.2vw, 24px); animation-delay: -2.6s; }
-.win-decor--star-middle-left { top: 34%; left: 22px; width: clamp(20px, 5.5vw, 25px); animation-delay: -3.4s; }
-.win-decor--star-middle-right { top: 39%; right: 23px; width: clamp(22px, 6.3vw, 29px); animation-delay: -.5s; }
-.win-decor--star-lower-left { bottom: 28px; left: 28px; width: clamp(18px, 4.8vw, 22px); animation-delay: -1.9s; }
-.win-decor--star-lower-right { right: 31px; bottom: 48px; width: clamp(20px, 5.4vw, 25px); animation-delay: -3s; }
+.result--win > * { position: relative; z-index: 1; }
+.win-sweets { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.win-sweet { position: absolute; display: block; height: auto; pointer-events: none; user-select: none; }
+.win-sweet--heart { top: 4%; left: 3%; width: clamp(42px, 12vw, 56px); }
+.win-sweet--lollipop { top: 38%; left: 0; width: clamp(34px, 10vw, 46px); }
+.win-sweet--candy-orange { bottom: 0; left: 5%; width: clamp(43px, 12vw, 56px); }
+.win-sweet--cookie { top: 2%; right: 3%; width: clamp(34px, 9vw, 40px); }
+.win-sweet--cupcake { top: 37%; right: 0; width: clamp(34px, 10vw, 43px); }
+.win-sweet--candy-purple { right: 5%; bottom: 1%; width: clamp(43px, 12vw, 56px); }
 .lose-decor { position: absolute; z-index: 0; display: block; height: auto; pointer-events: none; user-select: none; }
 .result--lose > :not(.lose-decor) { position: relative; z-index: 1; }
 .lose-decor--moon { top: 28px; left: clamp(88px, 25%, 116px); width: clamp(54px, 17vw, 76px); opacity: .92; animation: moon-sway 6.5s ease-in-out infinite; transform-origin: 50% 75%; }
@@ -152,7 +152,6 @@ button { -webkit-tap-highlight-color: transparent; }
 @keyframes moon-sway { 0%,100% { transform: rotate(-2deg) translateY(0); } 50% { transform: rotate(2deg) translateY(-3px); } }
 @keyframes zzz-float { 0%,100% { transform: translateY(2px); opacity: .72; } 50% { transform: translateY(-7px); opacity: .95; } }
 @keyframes star-soft { 0%,100% { transform: translateY(2px) scale(.94); opacity: .52; } 50% { transform: translateY(-3px) scale(1.04); opacity: .9; } }
-@keyframes win-star-soft { 0%,100% { transform: translateY(1px) scale(.97); opacity: .76; } 50% { transform: translateY(-2px) scale(1.03); opacity: .96; } }
 .view[data-view="win"]:not([hidden]) .result, .view[data-view="lose"]:not([hidden]) .result { animation: result-appear .35s ease-out both; }
 [data-state="win"] .event__logo, [data-state="win"] .stage,
 [data-state="lose"] .event__logo, [data-state="lose"] .stage { display: none; }
@@ -260,6 +259,11 @@ body { background: #1b0b3b; }
 }
 .copy-icon { border-color: #d39172; background: #fff1d6; color: #702c86; }
 .result__help { color: #56346b !important; }
+.result--win .result__help {
+  position: relative; z-index: 2; -webkit-text-stroke: .25px #fffaf8;
+  paint-order: stroke fill; text-shadow: 0 0 2px #fffdf7, 0 1px 1px #fff8f0;
+  padding: 2px 4px; border-radius: 5px; background: #fffaf64d;
+}
 .page[data-state="win"] .result--win {
   border: 2px solid #fbd486;
   background: linear-gradient(150deg, #ffe4f3e8, #d7b7f8ed 55%, #fbe3d7e8);
@@ -271,7 +275,8 @@ body { background: #1b0b3b; }
   min-height: 0; margin: 4px auto 10px;
 }
 .page[data-state="win"] .result__character--win {
-  flex: none; width: min(95vw, 42svh); max-width: none; max-height: none;
+  position: relative; z-index: 1; flex: none;
+  width: min(95vw, 42svh); max-width: none; max-height: none;
 }
 .page[data-state="lose"] .result--lose {
   border: 2px solid #fbd486;
