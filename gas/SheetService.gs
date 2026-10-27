@@ -97,6 +97,9 @@ function readCode_(campaignId, eventDate) {
   });
   if (active.length !== 1 || !active[0]) throw new Error('開催日に有効なコードが1件必要です。');
   var code = active[0];
+  if (campaignId === NG.HALLOWEEN_CAMPAIGN && !/^[A-Za-z0-9]{6}$/.test(code)) {
+    throw new Error('ハロウィン版のコードは英数字6桁にしてください。');
+  }
   var reused = rows.filter(function (row) {
     return String(row[2] || '').trim().toLowerCase() === code.toLowerCase();
   });

@@ -6,9 +6,10 @@ function statusFor_(deviceId, campaignId, now) {
   var campaign = readCampaign_(id);
   if (!campaign.enabled) return { ok: false, status: 'closed' };
 
-  var eventDate = eventDate_(now);
+  var eventDate = campaignEventDate_(campaign, now);
   var key = dedupeKey_(id, eventDate, userId);
-  var previous = findSuccess_(readHistory_(), key);
+  var rows = readHistory_();
+  var previous = findSuccess_(rows, key);
   if (previous) return resultResponse_(previous, true, eventDate);
   if (!isOpenNow_(campaign, now)) return { ok: false, status: 'closed', weekId: eventDate };
 
@@ -28,7 +29,7 @@ function drawFor_(deviceId, campaignId, requestId, now) {
 
   var campaign = readCampaign_(id);
   if (!campaign.enabled) return { ok: false, status: 'closed' };
-  var eventDate = eventDate_(now);
+  var eventDate = campaignEventDate_(campaign, now);
   var key = dedupeKey_(id, eventDate, userId);
   var rows = readHistory_();
   var requestRow = findRequest_(rows, request);
@@ -67,7 +68,8 @@ function drawFor_(deviceId, campaignId, requestId, now) {
   }
 
   var winners = countWinners_(rows, id, eventDate);
-  var won = winners < campaign.winnerLimit && Math.random() < campaign.probability;
+  var won = (campaign.winnerLimit === null || winners < campaign.winnerLimit) &&
+    Math.random() < campaign.probability;
   var points = won ? campaign.points : 0;
   appendHistory_({
     timestamp: now, eventDate: eventDate, userId: userId, campaignId: id,
@@ -84,6 +86,11 @@ function drawFor_(deviceId, campaignId, requestId, now) {
 
 function dedupeKey_(campaignId, eventDate, userId) {
   return campaignId + '|' + eventDate + '|' + userId;
+}
+
+function campaignEventDate_(campaign, now) {
+  // 2日間を1開催として扱い、同じ端末の参加は期間中1回にする。
+  return campaign.id === NG.HALLOWEEN_CAMPAIGN ? campaign.startDate : eventDate_(now);
 }
 
 function findSuccess_(rows, key) {

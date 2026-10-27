@@ -4,10 +4,10 @@
   // 公開WebアプリURLとキャンペーンIDだけを設定します。確率・コード・抽選条件はGASに置きます。
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
   var CAMPAIGN_ID = 'halloween-2026';
-  var PRELAUNCH = true;
+  var PRELAUNCH = false;
   var demoType = new URLSearchParams(window.location.search).get('demo');
   var DEMO_MODE = demoType === '1' || demoType === 'lose';
-  var DEMO_CODE = 'DEMO00';
+  var DEMO_CODE = 'HW8K2P';
   var API_TIMEOUT_MS = 20000;
   var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
@@ -134,7 +134,7 @@
       var isWin = data.status !== 'lose' && Number(data.result) === 20000 &&
         typeof data.campaignCode === 'string' && /^[A-Za-z0-9]{6}$/.test(data.campaignCode);
       var isLose = data.status !== 'win' && Number(data.result) === 0 && !data.campaignCode;
-      // 本番設定では全員当選。想定外の応答は結果として見せない。
+      // 想定外の応答は結果として見せない。
       if (!isWin && !isLose) return show('unavailable');
       root.querySelectorAll('[data-participated]').forEach(function (label) { label.hidden = data.status !== 'already_played'; });
       root.querySelector('[data-code]').textContent = isWin ? data.campaignCode : '';
@@ -231,7 +231,7 @@
     show('ready');
     return;
   }
-  // コード登録・GAS・シート設定の完了までは通常アクセスの抽選を停止する。
+  // GAS・シート設定の準備が完了していない場合のみ通常アクセスを停止する。
   if (PRELAUNCH) { show('closed'); return; }
 
   if (!configured()) { show('unavailable'); return; }

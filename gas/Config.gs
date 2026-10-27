@@ -2,6 +2,7 @@
 var NG = Object.freeze({
   TZ: 'Asia/Tokyo',
   DEFAULT_CAMPAIGN: 'night-gacha',
+  HALLOWEEN_CAMPAIGN: 'halloween-2026',
   CAMPAIGNS: '抽選設定',
   CODES: 'コード管理',
   HISTORY: 'ガチャ履歴',

@@ -53,7 +53,9 @@ function parseCampaign_(row) {
   };
   if (!enabled) return campaign;
 
-  var weekday = Number(row[3]);
+  var weekdayText = String(row[3] === null || row[3] === undefined ? '' : row[3]).trim();
+  var allDays = id === NG.HALLOWEEN_CAMPAIGN && weekdayText === '全日';
+  var weekday = allDays ? 0 : Number(weekdayText);
   var start = parseTime_(row[4], false);
   var end = parseTime_(row[5], true);
   var startDate = parseDateKey_(row[6]);
@@ -64,23 +66,28 @@ function parseCampaign_(row) {
   var probability = Number(probabilityText);
   var points = Number(pointsText);
   var limit = Number(limitText);
+  var unlimited = id === NG.HALLOWEEN_CAMPAIGN && limitText === '無制限';
 
-  if (!campaign.name || !Number.isInteger(weekday) || weekday < 1 || weekday > 7 ||
+  if (!campaign.name || (!allDays && (!Number.isInteger(weekday) || weekday < 1 || weekday > 7)) ||
       start >= end || (startDate && endDate && startDate > endDate) ||
       !probabilityText || !Number.isFinite(probability) || probability < 0 || probability > 1 ||
       !pointsText || !Number.isInteger(points) || points <= 0 ||
-      !limitText || !Number.isInteger(limit) || limit <= 0 || limit > 100000 ||
+      (!unlimited && (!limitText || !Number.isInteger(limit) || limit <= 0 || limit > 100000)) ||
       !campaign.allowedOrigin) {
     throw new Error('抽選設定の有効行に不足または不正な値があります。');
   }
-  // 現行サイトの当選表示は100pt固定。別ポイントのイベントは専用フロントと共に追加する。
+  // 過去の通常版と今回の専用フロントのポイント条件を混同しない。
   if (id === NG.DEFAULT_CAMPAIGN && (weekday !== 3 || points !== 100)) {
-    throw new Error('現行サイトは水曜日・100ptのみ対応しています。');
+    throw new Error('通常版は水曜日・100ptのみ対応しています。');
+  }
+  if (id === NG.HALLOWEEN_CAMPAIGN &&
+      (!startDate || !endDate || points !== 20000)) {
+    throw new Error('ハロウィン版は開催期間と20,000ptを設定してください。');
   }
   Object.assign(campaign, {
     weekday: weekday, startMinute: start, endMinute: end,
     startDate: startDate, endDate: endDate,
-    probability: probability, points: points, winnerLimit: limit,
+    probability: probability, points: points, winnerLimit: unlimited ? null : limit,
     allowedOrigin: origin,
   });
   return campaign;
@@ -95,7 +102,7 @@ function isOpenNow_(campaign, now) {
   var weekday = Number(Utilities.formatDate(now, NG.TZ, 'u'));
   var time = Utilities.formatDate(now, NG.TZ, 'HH:mm');
   var minute = Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
-  return campaign.enabled && weekday === campaign.weekday &&
+  return campaign.enabled && (campaign.weekday === 0 || weekday === campaign.weekday) &&
     (!campaign.startDate || date >= campaign.startDate) &&
     (!campaign.endDate || date <= campaign.endDate) &&
     minute >= campaign.startMinute && minute < campaign.endMinute;

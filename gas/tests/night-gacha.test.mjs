@@ -10,8 +10,9 @@ const headers = {
 };
 const deviceA = '12345678-1234-4234-8234-123456789abc';
 const deviceB = '12345678-1234-4234-8234-123456789abd';
-const wed = new Date('2026-10-07T03:00:00Z'); // 12:00 JST
-const thu = new Date('2026-10-08T03:00:00Z');
+const eventDay = new Date('2026-10-30T03:00:00Z'); // 30日12:00 JST
+const secondDay = new Date('2026-10-31T03:00:00Z'); // 31日12:00 JST
+const afterEvent = new Date('2026-11-01T03:00:00Z');
 
 function formatDate(date, timezone, pattern) {
   assert.equal(timezone, 'Asia/Tokyo');
@@ -47,8 +48,16 @@ function createSheet(name, rows) {
 
 function fixture() {
   const sheets = {
-    '抽選設定': createSheet('抽選設定', [headers['抽選設定'], ['night-gacha', '夜活ガチャ', 'ON', '3', '09:00', '21:00', '', '', '1', '100', '1', 'https://clear-official.github.io', '']]),
-    'コード管理': createSheet('コード管理', [headers['コード管理'], ['night-gacha', '2026-10-07', 'TEST-CODE-1', 'ON', '']]),
+    '抽選設定': createSheet('抽選設定', [
+      headers['抽選設定'],
+      ['halloween-2026', 'ハロウィン夜活ガチャ', 'ON', '全日', '00:00', '24:00', '2026-10-30', '2026-10-31', '1', '20000', '無制限', 'https://clear-official.github.io', ''],
+      ['night-gacha', '夜活ガチャ', 'ON', '3', '09:00', '21:00', '', '', '0.77', '100', '100', 'https://clear-official.github.io', ''],
+    ]),
+    'コード管理': createSheet('コード管理', [
+      headers['コード管理'],
+      ['halloween-2026', '2026-10-30', 'TEST42', 'ON', ''],
+      ['night-gacha', '2026-10-07', 'N7K4Q8', 'OFF', ''],
+    ]),
     'ガチャ履歴': createSheet('ガチャ履歴', [headers['ガチャ履歴']]),
   };
   const spreadsheet = {
@@ -63,6 +72,17 @@ function fixture() {
     PropertiesService: { getScriptProperties: () => ({ getProperty: key => properties[key], setProperty: (key, value) => { properties[key] = value; } }) },
     Utilities: { formatDate }, Logger: { log() {} },
     LockService: { getScriptLock: () => ({ tryLock: () => true, releaseLock() {} }) },
+    HtmlService: {
+      XFrameOptionsMode: { ALLOWALL: 'ALLOWALL' },
+      createTemplateFromFile: () => ({
+        allowedOrigin: '',
+        evaluate() { return {
+          allowedOrigin: this.allowedOrigin,
+          setTitle() { return this; },
+          setXFrameOptionsMode() { return this; },
+        }; },
+      }),
+    },
   });
   for (const name of ['Config.gs', 'ValidationService.gs', 'SheetService.gs', 'LotteryService.gs', 'Code.gs']) {
     vm.runInContext(fs.readFileSync(new URL(name, base), 'utf8'), context, { filename: name });
@@ -76,66 +96,127 @@ function test(name, fn) {
   process.stdout.write(`ok ${checks} - ${name}\n`);
 }
 
-test('100pt draw is stored once and replays with its code', () => {
+test('20,000pt draw is stored once and replays with its code', () => {
   const { context: c, sheets } = fixture();
-  const first = c.drawFor_(deviceA, 'night-gacha', 'request-1', wed);
+  const first = c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
   assert.equal(first.status, 'win');
-  assert.equal(first.result, 100);
-  assert.equal(first.campaignCode, 'TEST-CODE-1');
+  assert.equal(first.result, 20000);
+  assert.equal(first.campaignCode, 'TEST42');
+  assert.equal(sheets['ガチャ履歴'].rows[1][1], '2026-10-30');
   assert.equal(sheets['ガチャ履歴'].rows.length, 2);
-  const retry = c.drawFor_(deviceA, 'night-gacha', 'request-1', wed);
+  const retry = c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
   assert.equal(retry.status, 'already_played');
   assert.equal(retry.campaignCode, first.campaignCode);
   assert.equal(sheets['ガチャ履歴'].rows.length, 2);
-  const newRequest = c.drawFor_(deviceA, 'night-gacha', 'request-2', wed);
+  const newRequest = c.drawFor_(deviceA, 'halloween-2026', 'request-2', secondDay);
   assert.equal(newRequest.status, 'already_played');
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', afterEvent).status, 'already_played');
   assert.equal(sheets['ガチャ履歴'].rows[2][7], 'DUPLICATE');
   assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
 });
 
-test('winner limit caps a later participant', () => {
+test('another participant wins on day two without a winner limit', () => {
   const { context: c, sheets } = fixture();
-  c.drawFor_(deviceA, 'night-gacha', 'request-1', wed);
-  const next = c.drawFor_(deviceB, 'night-gacha', 'request-2', wed);
-  assert.equal(next.status, 'lose');
-  assert.equal(next.result, 0);
-  assert.equal('campaignCode' in next, false);
-  assert.equal(sheets['ガチャ履歴'].rows[2][6], '');
+  c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
+  assert.equal(c.statusFor_(deviceB, 'halloween-2026', secondDay).status, 'ready');
+  const next = c.drawFor_(deviceB, 'halloween-2026', 'request-2', secondDay);
+  assert.equal(next.status, 'win');
+  assert.equal(next.result, 20000);
+  assert.equal(next.campaignCode, 'TEST42');
+  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 2);
 });
 
-test('non-Wednesday and outside hours reject without a draw', () => {
+test('dates outside the two-day event reject without a draw', () => {
   const { context: c, sheets } = fixture();
-  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'request-1', thu).status, 'closed');
-  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'request-2', new Date('2026-10-06T23:59:00Z')).status, 'closed');
+  assert.equal(c.drawFor_(deviceA, 'halloween-2026', 'request-1', afterEvent).status, 'closed');
+  assert.equal(c.drawFor_(deviceA, 'halloween-2026', 'request-2', new Date('2026-10-29T14:59:00Z')).status, 'closed');
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-10-29T15:00:00Z')).status, 'ready');
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-10-31T14:59:00Z')).status, 'ready');
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-10-31T15:00:00Z')).status, 'closed');
   assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 0);
 });
 
 test('disabled campaign, invalid ID, missing code and bad settings fail closed', () => {
   const { context: c, sheets } = fixture();
   sheets['抽選設定'].rows[1][2] = 'OFF';
-  assert.equal(c.readCampaign_('night-gacha').allowedOrigin, 'https://clear-official.github.io');
-  assert.equal(c.statusFor_(deviceA, 'night-gacha', wed).status, 'closed');
+  assert.equal(c.readCampaign_('halloween-2026').allowedOrigin, 'https://clear-official.github.io');
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', eventDay).status, 'closed');
   sheets['抽選設定'].rows[1][2] = 'ON';
-  assert.equal(c.drawFor_('=evil', 'night-gacha', 'request-1', wed).status, 'temporarily_unavailable');
-  sheets['コード管理'].rows.pop();
-  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'request-2', wed).status, 'temporarily_unavailable');
+  assert.equal(c.drawFor_('=evil', 'halloween-2026', 'request-1', eventDay).status, 'temporarily_unavailable');
+  sheets['コード管理'].rows.splice(1, 1);
+  assert.equal(c.drawFor_(deviceA, 'halloween-2026', 'request-2', eventDay).status, 'temporarily_unavailable');
   assert.equal(sheets['ガチャ履歴'].rows[1][8], 'CODE_CONFIGURATION');
   sheets['抽選設定'].rows[1][8] = '';
-  assert.throws(() => c.statusFor_(deviceA, 'night-gacha', wed), /抽選設定/);
+  assert.throws(() => c.statusFor_(deviceA, 'halloween-2026', eventDay), /抽選設定/);
 });
 
 test('bridge origin remains available while draw settings are temporarily invalid', () => {
   const { context: c, sheets } = fixture();
   sheets['抽選設定'].rows[1][4] = '21:00';
   sheets['抽選設定'].rows[1][5] = '11:30';
-  assert.throws(() => c.readCampaign_('night-gacha'), /抽選設定/);
-  assert.equal(c.readAllowedOrigin_('night-gacha'), 'https://clear-official.github.io');
+  assert.throws(() => c.readCampaign_('halloween-2026'), /抽選設定/);
+  assert.equal(c.readAllowedOrigin_('halloween-2026'), 'https://clear-official.github.io');
+});
+
+test('bridge selects the requested campaign origin and preserves the old default', () => {
+  const { context: c, sheets } = fixture();
+  assert.equal(c.doGet({ parameter: { campaignId: 'halloween-2026' } }).allowedOrigin,
+    'https://clear-official.github.io');
+  assert.equal(c.doGet().allowedOrigin, 'https://clear-official.github.io');
+  sheets['抽選設定'].rows.splice(2, 1);
+  assert.equal(c.doGet({ parameter: { campaignId: 'halloween-2026' } }).allowedOrigin,
+    'https://clear-official.github.io');
+  assert.equal(c.doGet().allowedOrigin, '');
+});
+
+test('Halloween configuration keeps 20,000pt and a six-character code', () => {
+  const { context: c, sheets } = fixture();
+  assert.equal(c.NG.DEFAULT_CAMPAIGN, 'night-gacha');
+  assert.equal(c.NG.HALLOWEEN_CAMPAIGN, 'halloween-2026');
+  assert.equal(c.readCampaign_('night-gacha').points, 100);
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', eventDay).status, 'ready');
+  sheets['抽選設定'].rows[1][8] = '0.77';
+  assert.equal(c.readCampaign_('halloween-2026').probability, 0.77);
+  sheets['抽選設定'].rows[1][8] = '1';
+  sheets['抽選設定'].rows[1][9] = '100';
+  assert.throws(() => c.readCampaign_('halloween-2026'), /20,000pt/);
+  sheets['抽選設定'].rows[1][9] = '20000';
+  sheets['抽選設定'].rows[1][10] = '100';
+  assert.equal(c.readCampaign_('halloween-2026').winnerLimit, 100);
+  sheets['抽選設定'].rows[1][10] = '無制限';
+  sheets['抽選設定'].rows[1][6] = '2026-10-29';
+  assert.equal(c.readCampaign_('halloween-2026').startDate, '2026-10-29');
+  sheets['抽選設定'].rows[1][6] = '2026-10-30';
+  sheets['コード管理'].rows[1][2] = 'TOO-LONG';
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', eventDay).status, 'temporarily_unavailable');
+});
+
+test('Halloween numeric winner limit is enforced across both days', () => {
+  const { context: c, sheets } = fixture();
+  sheets['抽選設定'].rows[1][10] = '1';
+  const first = c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
+  const second = c.drawFor_(deviceB, 'halloween-2026', 'request-2', secondDay);
+  assert.equal(first.status, 'win');
+  assert.equal(second.status, 'lose');
+  assert.equal(second.result, 0);
+  assert.equal(second.campaignCode, undefined);
+  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[4] === 'win').length, 1);
+});
+
+test('the original Wednesday campaign retains its winner limit', () => {
+  const { context: c, sheets } = fixture();
+  sheets['抽選設定'].rows[2][8] = '1';
+  sheets['抽選設定'].rows[2][10] = '1';
+  sheets['コード管理'].rows[2][3] = 'ON';
+  const oldEvent = new Date('2026-10-07T03:00:00Z');
+  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'old-1', oldEvent).status, 'win');
+  assert.equal(c.drawFor_(deviceB, 'night-gacha', 'old-2', oldEvent).status, 'lose');
 });
 
 test('a request ID cannot be reused by another user', () => {
   const { context: c, sheets } = fixture();
-  c.drawFor_(deviceA, 'night-gacha', 'request-1', wed);
-  assert.equal(c.drawFor_(deviceB, 'night-gacha', 'request-1', wed).status, 'temporarily_unavailable');
+  c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
+  assert.equal(c.drawFor_(deviceB, 'halloween-2026', 'request-1', eventDay).status, 'temporarily_unavailable');
   assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
 });
 

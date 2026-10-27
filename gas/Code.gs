@@ -33,10 +33,11 @@ function drawApi(deviceId, requestId, campaignId) {
 }
 
 /** GitHub Pages が読み込む、送信元制限付きの iframe ブリッジ。 */
-function doGet() {
+function doGet(e) {
   var template = HtmlService.createTemplateFromFile('Bridge');
   try {
-    template.allowedOrigin = readAllowedOrigin_(NG.DEFAULT_CAMPAIGN);
+    var campaignId = e && e.parameter && e.parameter.campaignId;
+    template.allowedOrigin = readAllowedOrigin_(campaignId || NG.DEFAULT_CAMPAIGN);
   } catch (error) {
     template.allowedOrigin = '';
     console.error('Night Gacha bridge configuration: ' + safeError_(error));
