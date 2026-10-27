@@ -10,7 +10,7 @@ function setupSheets_() {
     throw new Error('紐づけ型GASで実行するか、SPREADSHEET_ID をスクリプトプロパティに設定してください。');
   }
   var spreadsheet = savedId ? SpreadsheetApp.openById(savedId) : active;
-  var names = [NG.CAMPAIGNS, NG.CODES, NG.HISTORY];
+  var names = [NG.CAMPAIGNS, NG.CODES, NG.HISTORY, NG.HALLOWEEN_HISTORY];
 
   // 先に全シートを確認し、既存見出しが違う場合は作成を始めない。
   names.forEach(function (name) {
@@ -30,8 +30,8 @@ function setupSheets_() {
 
   SpreadsheetApp.flush();
   if (!savedId) properties.setProperty('SPREADSHEET_ID', spreadsheet.getId());
-  Logger.log('夜活ガチャ: 3シートの見出しを確認しました。運営値は自動入力していません。');
-  return '抽選設定・コード管理・ガチャ履歴の見出しを確認しました。';
+  Logger.log('夜活ガチャ: 4シートの見出しを確認しました。運営値は自動入力していません。');
+  return '抽選設定・コード管理・2種類のガチャ履歴の見出しを確認しました。';
 }
 
 function configuredSpreadsheet_() {
@@ -107,12 +107,17 @@ function readCode_(campaignId, eventDate) {
   return code;
 }
 
-function readHistory_() {
-  return sheetRows_(requiredSheet_(configuredSpreadsheet_(), NG.HISTORY), false);
+function historySheetName_(campaignId) {
+  return campaignId === NG.HALLOWEEN_CAMPAIGN ? NG.HALLOWEEN_HISTORY : NG.HISTORY;
+}
+
+function readHistory_(campaignId) {
+  var name = historySheetName_(campaignId);
+  return sheetRows_(requiredSheet_(configuredSpreadsheet_(), name), false);
 }
 
 function appendHistory_(entry) {
-  var sheet = requiredSheet_(configuredSpreadsheet_(), NG.HISTORY);
+  var sheet = requiredSheet_(configuredSpreadsheet_(), historySheetName_(entry.campaignId));
   sheet.appendRow([
     entry.timestamp, entry.eventDate || '', entry.userId || '', entry.campaignId || '',
     entry.result || '', entry.points === undefined ? '' : entry.points,

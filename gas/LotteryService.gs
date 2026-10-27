@@ -8,7 +8,7 @@ function statusFor_(deviceId, campaignId, now) {
 
   var eventDate = campaignEventDate_(campaign, now);
   var key = dedupeKey_(id, eventDate, userId);
-  var rows = readHistory_();
+  var rows = readHistory_(id);
   var previous = findSuccess_(rows, key);
   if (previous) return resultResponse_(previous, true, eventDate);
   if (!isOpenNow_(campaign, now)) return { ok: false, status: 'closed', weekId: eventDate };
@@ -31,7 +31,7 @@ function drawFor_(deviceId, campaignId, requestId, now) {
   if (!campaign.enabled) return { ok: false, status: 'closed' };
   var eventDate = campaignEventDate_(campaign, now);
   var key = dedupeKey_(id, eventDate, userId);
-  var rows = readHistory_();
+  var rows = readHistory_(id);
   var requestRow = findRequest_(rows, request);
   if (requestRow && String(requestRow[11]) !== key) return unavailable_();
 

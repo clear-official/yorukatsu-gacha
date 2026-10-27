@@ -7,6 +7,7 @@ const headers = {
   '抽選設定': ['キャンペーンID', 'キャンペーン名', '有効', '開催曜日', '開始時刻', '終了時刻', '開始日', '終了日', '当選確率', '当選ポイント', '当選上限', '許可オリジン', '備考'],
   'コード管理': ['キャンペーンID', '開催日', 'キャンペーンコード', '有効', '備考'],
   'ガチャ履歴': ['実行日時', '開催日', 'ユーザーID', 'キャンペーンID', '抽選結果', '付与ポイント', 'キャンペーンコード', '処理結果', 'エラーコード', '備考', 'リクエストID', '重複判定キー'],
+  'ハロウィンガチャ履歴': ['実行日時', '開催日', 'ユーザーID', 'キャンペーンID', '抽選結果', '付与ポイント', 'キャンペーンコード', '処理結果', 'エラーコード', '備考', 'リクエストID', '重複判定キー'],
 };
 const deviceA = '12345678-1234-4234-8234-123456789abc';
 const deviceB = '12345678-1234-4234-8234-123456789abd';
@@ -59,6 +60,7 @@ function fixture() {
       ['night-gacha', '2026-10-07', 'N7K4Q8', 'OFF', ''],
     ]),
     'ガチャ履歴': createSheet('ガチャ履歴', [headers['ガチャ履歴']]),
+    'ハロウィンガチャ履歴': createSheet('ハロウィンガチャ履歴', [headers['ハロウィンガチャ履歴']]),
   };
   const spreadsheet = {
     getId: () => 'test-spreadsheet',
@@ -102,17 +104,18 @@ test('20,000pt draw is stored once and replays with its code', () => {
   assert.equal(first.status, 'win');
   assert.equal(first.result, 20000);
   assert.equal(first.campaignCode, 'TEST42');
-  assert.equal(sheets['ガチャ履歴'].rows[1][1], '2026-10-30');
-  assert.equal(sheets['ガチャ履歴'].rows.length, 2);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows[1][1], '2026-10-30');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.length, 2);
+  assert.equal(sheets['ガチャ履歴'].rows.length, 1);
   const retry = c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
   assert.equal(retry.status, 'already_played');
   assert.equal(retry.campaignCode, first.campaignCode);
-  assert.equal(sheets['ガチャ履歴'].rows.length, 2);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.length, 2);
   const newRequest = c.drawFor_(deviceA, 'halloween-2026', 'request-2', secondDay);
   assert.equal(newRequest.status, 'already_played');
   assert.equal(c.statusFor_(deviceA, 'halloween-2026', afterEvent).status, 'already_played');
-  assert.equal(sheets['ガチャ履歴'].rows[2][7], 'DUPLICATE');
-  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows[2][7], 'DUPLICATE');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
 });
 
 test('another participant wins on day two without a winner limit', () => {
@@ -123,7 +126,7 @@ test('another participant wins on day two without a winner limit', () => {
   assert.equal(next.status, 'win');
   assert.equal(next.result, 20000);
   assert.equal(next.campaignCode, 'TEST42');
-  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 2);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 2);
 });
 
 test('dates outside the two-day event reject without a draw', () => {
@@ -133,7 +136,7 @@ test('dates outside the two-day event reject without a draw', () => {
   assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-10-29T15:00:00Z')).status, 'ready');
   assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-10-31T14:59:00Z')).status, 'ready');
   assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-10-31T15:00:00Z')).status, 'closed');
-  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 0);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 0);
 });
 
 test('disabled campaign, invalid ID, missing code and bad settings fail closed', () => {
@@ -145,7 +148,7 @@ test('disabled campaign, invalid ID, missing code and bad settings fail closed',
   assert.equal(c.drawFor_('=evil', 'halloween-2026', 'request-1', eventDay).status, 'temporarily_unavailable');
   sheets['コード管理'].rows.splice(1, 1);
   assert.equal(c.drawFor_(deviceA, 'halloween-2026', 'request-2', eventDay).status, 'temporarily_unavailable');
-  assert.equal(sheets['ガチャ履歴'].rows[1][8], 'CODE_CONFIGURATION');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows[1][8], 'CODE_CONFIGURATION');
   sheets['抽選設定'].rows[1][8] = '';
   assert.throws(() => c.statusFor_(deviceA, 'halloween-2026', eventDay), /抽選設定/);
 });
@@ -200,7 +203,7 @@ test('Halloween numeric winner limit is enforced across both days', () => {
   assert.equal(second.status, 'lose');
   assert.equal(second.result, 0);
   assert.equal(second.campaignCode, undefined);
-  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[4] === 'win').length, 1);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.filter(row => row[4] === 'win').length, 1);
 });
 
 test('the original Wednesday campaign retains its winner limit', () => {
@@ -211,13 +214,34 @@ test('the original Wednesday campaign retains its winner limit', () => {
   const oldEvent = new Date('2026-10-07T03:00:00Z');
   assert.equal(c.drawFor_(deviceA, 'night-gacha', 'old-1', oldEvent).status, 'win');
   assert.equal(c.drawFor_(deviceB, 'night-gacha', 'old-2', oldEvent).status, 'lose');
+  assert.equal(sheets['ガチャ履歴'].rows.length, 3);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.length, 1);
+});
+
+test('the same device can enter each campaign without mixing history', () => {
+  const { context: c, sheets } = fixture();
+  const oldEvent = new Date('2026-10-07T03:00:00Z');
+  sheets['抽選設定'].rows[2][8] = '1';
+  sheets['コード管理'].rows[2][3] = 'ON';
+  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'old-1', oldEvent).status, 'win');
+  assert.equal(c.drawFor_(deviceA, 'halloween-2026', 'new-1', eventDay).status, 'win');
+  assert.equal(sheets['ガチャ履歴'].rows[1][3], 'night-gacha');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows[1][3], 'halloween-2026');
+});
+
+test('a missing Halloween history tab fails closed without writing to the regular tab', () => {
+  const { context: c, sheets } = fixture();
+  delete sheets['ハロウィンガチャ履歴'];
+  assert.equal(c.statusApi(deviceA, 'halloween-2026').status, 'temporarily_unavailable');
+  assert.equal(c.drawApi(deviceA, 'request-1', 'halloween-2026').status, 'temporarily_unavailable');
+  assert.equal(sheets['ガチャ履歴'].rows.length, 1);
 });
 
 test('a request ID cannot be reused by another user', () => {
   const { context: c, sheets } = fixture();
   c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);
   assert.equal(c.drawFor_(deviceB, 'halloween-2026', 'request-1', eventDay).status, 'temporarily_unavailable');
-  assert.equal(sheets['ガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
 });
 
 test('setup preserves populated rows and existing spreadsheet ID', () => {
