@@ -334,7 +334,8 @@ body { background: #1b0b3b; }
 .ghost-scene__star--left { left: -16%; top: 42%; }
 .ghost-scene__star--lower { left: -12%; top: 57%; width: 15px; height: 15px; }
 @media (max-width: 599px) {
-  .page { padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom)); }
+  .page { padding: 0 12px calc(12px + env(safe-area-inset-bottom)); }
+  .page[data-state="win"], .page[data-state="lose"] { padding-top: 0; }
   .event { padding: 14px 16px 17px; }
   .machine { width: min(80%, 270px, 33svh); }
   .event__logo { margin-bottom: -3px; }
