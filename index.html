@@ -20,7 +20,7 @@
   </script>
   <link rel="preload" as="image" href="assets/images/halloween-logo.png">
   <link rel="preload" as="image" href="assets/images/halloween-background.png">
-  <link rel="stylesheet" href="styles.css?v=20261027-6">
+  <link rel="stylesheet" href="styles.css?v=20261027-7">
   <script src="app.js?v=20261027-6" defer></script>
 </head>
 <body>
@@ -94,14 +94,16 @@
               <h2>ざんねん…</h2>
               <div class="result__character-slot">
                 <div class="ghost-scene">
-                  <span class="ghost-scene__coin" aria-hidden="true"><span>P</span></span>
+                  <svg class="ghost-scene__smoke" viewBox="0 0 88 112" aria-hidden="true">
+                    <path d="M23 99c-13-10-9-22 4-29 15-8 18-18 6-27-10-8-8-19 6-24"/>
+                    <path d="M44 104c17-12 20-25 5-35-10-7-10-16 1-23 10-7 12-15 4-23"/>
+                    <path d="M66 92c-9-8-9-16 1-23 8-5 11-12 6-18"/>
+                    <circle cx="27" cy="27" r="2.5"/><circle cx="64" cy="37" r="2"/>
+                  </svg>
+                  <span class="ghost-scene__coin" aria-hidden="true">P</span>
                   <img class="result__character result__character--lose" src="assets/images/halloween-ria-lose.png" alt="おばけ姿のリアちゃん" width="1003" height="1568">
                   <svg class="ghost-scene__star ghost-scene__star--left" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
-                  <svg class="ghost-scene__star ghost-scene__star--right" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
                   <svg class="ghost-scene__star ghost-scene__star--lower" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
-                  <span class="ghost-scene__glimmer ghost-scene__glimmer--left" aria-hidden="true"></span>
-                  <span class="ghost-scene__glimmer ghost-scene__glimmer--right" aria-hidden="true"></span>
-                  <svg class="ghost-scene__trail" viewBox="0 0 70 35" aria-hidden="true"><path d="M3 28 Q26 4 58 12"/><circle cx="13" cy="20" r="1.6"/><circle cx="44" cy="11" r="1.5"/><circle cx="62" cy="14" r="1.2"/></svg>
                 </div>
               </div>
               <p class="result__lose-message">リアちゃんがいたずらして、<br>ポイントを隠しちゃった…💧</p>

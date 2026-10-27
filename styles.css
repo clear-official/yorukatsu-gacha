@@ -298,28 +298,29 @@ body { background: #1b0b3b; }
 }
 /* Decorations sit around the original ghost illustration without changing it. */
 .ghost-scene { position: relative; height: 100%; aspect-ratio: 1003 / 1568; flex: none; }
+.ghost-scene__smoke {
+  position: absolute; z-index: 1; left: 101%; top: 36%; width: 37%; height: auto;
+  overflow: visible; opacity: .68;
+}
+.ghost-scene__smoke path {
+  fill: none; stroke: #a875e6; stroke-width: 8; stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ghost-scene__smoke path:nth-child(2) { stroke: #c39af0; stroke-width: 7; }
+.ghost-scene__smoke path:nth-child(3) { stroke: #b887ea; stroke-width: 6; }
+.ghost-scene__smoke circle { fill: #a875e6; }
 .ghost-scene__coin {
-  position: absolute; z-index: 1; left: 78.8%; top: 76.5%; width: 16%; aspect-ratio: 1;
-  display: block; transform: translate(-50%, -50%); border: 2px solid #23345c;
-  border-radius: 50%; background: #f7d363;
-  box-shadow: inset 0 0 0 2px #fff0aa, 0 1px 2px #34215f4d;
-  color: #8d5a23; font-size: clamp(9px, 2vw, 12px); font-weight: 900;
+  position: absolute; z-index: 3; left: 113%; top: 52%; width: 19%; aspect-ratio: 1;
+  display: grid; place-items: center; transform: translate(-50%, -50%);
+  border: 2px solid #b95b11; border-radius: 50%;
+  background: linear-gradient(135deg, #fff09a, #ffc447 55%, #f28c24);
+  box-shadow: 0 0 0 1px #23345c, inset 0 0 0 2px #ffe8a0;
+  color: #9b5115; font-size: clamp(14px, 2.8vw, 18px); font-weight: 900; line-height: 1;
 }
-.ghost-scene__coin span { position: absolute; right: 13%; top: 50%; transform: translateY(-50%); }
-.ghost-scene__star { position: absolute; z-index: 3; width: 14px; height: 14px; overflow: visible; }
+.ghost-scene__star { position: absolute; z-index: 3; width: 20px; height: 20px; overflow: visible; filter: drop-shadow(0 0 2px #fff0a0); }
 .ghost-scene__star path { fill: #ffe07a; stroke: #23345c; stroke-width: 1.2; stroke-linejoin: round; }
-.ghost-scene__star--left { left: 4%; top: 37%; }
-.ghost-scene__star--right { right: 2%; top: 43%; }
-.ghost-scene__star--lower { left: 6%; top: 68%; }
-.ghost-scene__glimmer {
-  position: absolute; z-index: 3; width: 4px; height: 4px; border-radius: 50%;
-  background: #e7d6ff; box-shadow: 0 0 4px #cbb8ef;
-}
-.ghost-scene__glimmer--left { left: 14%; top: 42%; }
-.ghost-scene__glimmer--right { right: 11%; top: 50%; }
-.ghost-scene__trail { position: absolute; z-index: 3; left: 76%; top: 69%; width: 28%; height: auto; overflow: visible; }
-.ghost-scene__trail path { fill: none; stroke: #f5d66e; stroke-width: 1.5; stroke-linecap: round; }
-.ghost-scene__trail circle { fill: #d9c5fb; stroke: #23345c; stroke-width: .4; }
+.ghost-scene__star--left { left: -16%; top: 42%; }
+.ghost-scene__star--lower { left: -12%; top: 57%; width: 15px; height: 15px; }
 @media (max-width: 599px) {
   .page { padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom)); }
   .event { padding: 14px 16px 17px; }
