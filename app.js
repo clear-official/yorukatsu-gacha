@@ -12,8 +12,10 @@
   var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
   if (!root) return;
+  if (window.innerWidth < 600 && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   var frame = root.querySelector('.gas-bridge');
+  var eventPanel = root.querySelector('.event');
   var machine = root.querySelector('[data-machine]');
   var confetti = root.querySelector('[data-confetti]');
   var confettiTimer = 0;
@@ -24,6 +26,39 @@
   var pending = new Map();
   var sequence = 0;
   var apiUrl = '';
+
+  function fitGacha() {
+    if (window.innerWidth >= 600 || activeView === 'win' || activeView === 'lose') {
+      root.classList.remove('is-fitted');
+      root.style.removeProperty('--viewport-height');
+      return;
+    }
+    var viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if (!viewportHeight) return;
+    root.style.setProperty('--viewport-height', viewportHeight + 'px');
+    root.classList.add('is-fitted');
+    var style = window.getComputedStyle(root);
+    var availableHeight = root.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - 1;
+    var panelHeight = eventPanel.offsetHeight;
+    if (!panelHeight) return;
+    var scale = Math.min(1, Math.max(0, availableHeight / panelHeight));
+    root.style.setProperty('--stage-scale', scale.toFixed(5));
+    root.style.setProperty('--stage-height', (panelHeight * scale).toFixed(2) + 'px');
+  }
+
+  var fitQueued = false;
+  function queueFit() {
+    if (fitQueued) return;
+    fitQueued = true;
+    window.requestAnimationFrame(function () { fitQueued = false; fitGacha(); });
+  }
+  window.addEventListener('resize', queueFit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', queueFit);
+  if (window.ResizeObserver) new ResizeObserver(queueFit).observe(eventPanel);
+  window.addEventListener('pageshow', function () {
+    if (activeView !== 'win' && activeView !== 'lose') window.scrollTo(0, 0);
+    queueFit();
+  });
 
   function clearConfetti() {
     window.clearTimeout(confettiTimer);
@@ -57,6 +92,7 @@
     root.querySelectorAll('[data-view]').forEach(function (el) {
       el.hidden = el.getAttribute('data-view') !== view;
     });
+    fitGacha();
   }
 
   function getDeviceId() {
@@ -222,6 +258,8 @@
     if (action === 'retry') syncStatus();
     if (action === 'copy') copyCode(button);
   });
+
+  fitGacha();
 
   if (DEMO_MODE) {
     root.setAttribute('data-demo', 'true');

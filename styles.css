@@ -7,6 +7,7 @@
 * { box-sizing: border-box; }
 html { min-width: 320px; min-height: 100%; background: #242754; }
 body { margin: 0; min-width: 320px; color: #f1efff; font-family: var(--body-font); }
+.filter-definitions { position: absolute; }
 button { -webkit-tap-highlight-color: transparent; }
 .page {
   position: relative; isolation: isolate; min-height: 100vh; min-height: 100svh;
@@ -336,6 +337,19 @@ body { background: #1b0b3b; }
 @media (max-width: 599px) {
   .page { padding: 0 12px calc(12px + env(safe-area-inset-bottom)); }
   .page[data-state="win"], .page[data-state="lose"] { padding-top: 0; }
+  .page[data-state="loading"] .view[data-view="loading"] { min-height: 88px; padding: 12px 16px; }
+  .page.is-fitted:not([data-state="win"]):not([data-state="lose"]) {
+    display: flex; align-items: center; justify-content: center;
+    height: 100vh; height: 100dvh; height: var(--viewport-height, 100dvh);
+    min-height: 0; padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  }
+  .page.is-fitted:not([data-state="win"]):not([data-state="lose"]) .page__inner {
+    flex: 0 0 auto; width: min(100%, 520px); height: var(--stage-height);
+  }
+  .page.is-fitted:not([data-state="win"]):not([data-state="lose"]) .event {
+    position: absolute; top: 0; right: 0; left: 0;
+    transform: scale(var(--stage-scale, 1)); transform-origin: top center;
+  }
   .event { padding: 14px 16px 17px; }
   .machine { width: min(80%, 270px, 33svh); }
   .event__logo { margin-bottom: -3px; }
