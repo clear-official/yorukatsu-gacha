@@ -126,7 +126,10 @@ button { -webkit-tap-highlight-color: transparent; }
 .result__message { font-size: 18px !important; color: #625a8d !important; font-weight: 750; }
 .result--win > * { position: relative; z-index: 1; }
 .win-sweets { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-.win-sweet { position: absolute; display: block; height: auto; pointer-events: none; user-select: none; }
+.win-sweet {
+  position: absolute; display: block; height: auto; pointer-events: none; user-select: none;
+  filter: url("#sweet-sticker-border");
+}
 .win-sweet--heart { top: 4%; left: 3%; width: clamp(42px, 12vw, 56px); }
 .win-sweet--lollipop { top: 38%; left: 0; width: clamp(34px, 10vw, 46px); }
 .win-sweet--candy-orange { bottom: 0; left: 5%; width: clamp(43px, 12vw, 56px); }

@@ -20,10 +20,23 @@
   </script>
   <link rel="preload" as="image" href="assets/images/halloween-logo.png">
   <link rel="preload" as="image" href="assets/images/halloween-background.png">
-  <link rel="stylesheet" href="styles.css?v=20261027-9">
+  <link rel="stylesheet" href="styles.css?v=20261027-10">
   <script src="app.js?v=20261027-6" defer></script>
 </head>
 <body>
+  <svg width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="sweet-sticker-border" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feComponentTransfer in="SourceAlpha" result="sticker-shape"><feFuncA type="linear" slope="40" intercept="-20"/></feComponentTransfer>
+      <feMorphology in="sticker-shape" operator="dilate" radius="1.8" result="border-shape"/>
+      <feFlood flood-color="#d9c0f6" result="border-color"/>
+      <feComposite in="border-color" in2="border-shape" operator="in" result="sticker-border"/>
+      <feGaussianBlur in="border-shape" stdDeviation="1" result="shadow-blur"/>
+      <feOffset in="shadow-blur" dy="1" result="shadow-offset"/>
+      <feFlood flood-color="#30244a" flood-opacity=".18" result="shadow-color"/>
+      <feComposite in="shadow-color" in2="shadow-offset" operator="in" result="sticker-shadow"/>
+      <feMerge><feMergeNode in="sticker-shadow"/><feMergeNode in="sticker-border"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </svg>
   <main class="page" data-app>
     <div class="night-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><b></b><b></b></div>
     <div class="page__inner">
