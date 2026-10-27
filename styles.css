@@ -299,16 +299,20 @@ body { background: #1b0b3b; }
 /* Decorations sit around the original ghost illustration without changing it. */
 .ghost-scene { position: relative; height: 100%; aspect-ratio: 1003 / 1568; flex: none; }
 .ghost-scene__smoke {
-  position: absolute; z-index: 1; left: 101%; top: 36%; width: 37%; height: auto;
-  overflow: visible; opacity: .68;
+  position: absolute; z-index: 1; top: 34%; width: 64%; height: auto;
+  overflow: visible; opacity: .68; pointer-events: none;
+  filter: drop-shadow(0 0 3px #c9a5ee);
 }
-.ghost-scene__smoke path {
-  fill: none; stroke: #a875e6; stroke-width: 8; stroke-linecap: round;
-  stroke-linejoin: round;
+.ghost-scene__smoke--left { left: -54%; }
+.ghost-scene__smoke--right { left: 90%; transform: scaleX(-1) rotate(5deg); }
+.ghost-scene__smoke-body {
+  fill: none; stroke: #aa80e7; stroke-width: 23; stroke-linecap: round;
+  stroke-linejoin: round; opacity: .62;
 }
-.ghost-scene__smoke path:nth-child(2) { stroke: #c39af0; stroke-width: 7; }
-.ghost-scene__smoke path:nth-child(3) { stroke: #b887ea; stroke-width: 6; }
-.ghost-scene__smoke circle { fill: #a875e6; }
+.ghost-scene__smoke-light {
+  fill: none; stroke: #dcc0f8; stroke-width: 8; stroke-linecap: round; opacity: .68;
+}
+.ghost-scene__smoke circle { fill: #a477e4; opacity: .72; }
 .ghost-scene__coin {
   position: absolute; z-index: 3; left: 113%; top: 52%; width: 19%; aspect-ratio: 1;
   display: grid; place-items: center; transform: translate(-50%, -50%);
@@ -326,6 +330,9 @@ body { background: #1b0b3b; }
   .event { padding: 14px 16px 17px; }
   .machine { width: min(80%, 270px, 33svh); }
   .event__logo { margin-bottom: -3px; }
+  .ghost-scene__smoke { top: 38%; width: 49%; }
+  .ghost-scene__smoke--left { left: -34%; }
+  .ghost-scene__smoke--right { left: 87%; }
 }
 @media (min-width: 600px) { .event__logo { width: 100%; margin: -6px auto 1px; } }
 
