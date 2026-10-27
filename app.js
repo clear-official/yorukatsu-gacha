@@ -16,6 +16,9 @@
 
   var frame = root.querySelector('.gas-bridge');
   var eventPanel = root.querySelector('.event');
+  var winCard = root.querySelector('.result--win');
+  var winHelp = winCard.querySelector('.result__help');
+  var claimButton = winCard.querySelector('.button--claim');
   var machine = root.querySelector('[data-machine]');
   var confetti = root.querySelector('[data-confetti]');
   var confettiTimer = 0;
@@ -27,11 +30,28 @@
   var sequence = 0;
   var apiUrl = '';
 
+  function centerWinHelp() {
+    if (window.innerWidth >= 600 || activeView !== 'win') {
+      winHelp.style.removeProperty('--help-offset');
+      return;
+    }
+    winHelp.style.setProperty('--help-offset', '0px');
+    var card = winCard.getBoundingClientRect();
+    var claim = claimButton.getBoundingClientRect();
+    var help = winHelp.getBoundingClientRect();
+    var space = card.bottom - claim.bottom;
+    if (space < help.height + 20) return;
+    var centeredTop = claim.bottom + (space - help.height) / 2;
+    var offset = Math.min(centeredTop - help.top, card.bottom - 12 - help.bottom);
+    winHelp.style.setProperty('--help-offset', Math.max(0, offset).toFixed(2) + 'px');
+  }
+
   function fitGacha() {
     if (window.innerWidth >= 600 || activeView === 'win' || activeView === 'lose') {
       root.classList.remove('is-fitted');
       root.classList.remove('is-booting');
       root.style.removeProperty('--viewport-height');
+      centerWinHelp();
       return;
     }
     var viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
