@@ -191,3 +191,92 @@ button { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 600px) { .page { padding-top: 40px; } .event { padding: 28px 32px; } .event__logo { width: 100%; margin: 0 auto 14px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .capsule-motion { display: none !important; } }
 @media (max-width: 599px) { .machine { width: min(86%, 290px); } }
+
+/* 2026 Halloween edition. Keep the seasonal art separate from the original assets. */
+html { background: #1b0b3b; }
+body { background: #1b0b3b; }
+.page {
+  background: linear-gradient(180deg, #18083112, #320a530b 55%, #16081d26),
+    url("assets/images/halloween-background.png") center top / cover no-repeat;
+}
+.page::before, .page::after { background: radial-gradient(ellipse, #ffad4b38, transparent 69%); }
+.event {
+  border-color: #e0a9ff9c;
+  background: radial-gradient(ellipse at 50% 43%, #b451f30e, transparent 67%),
+    linear-gradient(165deg, #4410801f, #2a0b6440 58%, #56248124);
+  box-shadow: inset 0 1px 0 #ffcaff5c, inset 0 0 24px #f6a7ff0d,
+    0 12px 34px #10052272, 0 0 17px #e06dff30;
+}
+.event::before { background: linear-gradient(90deg, transparent, #f9c4ffb8, transparent); }
+.event__logo { width: 111%; max-width: 500px; aspect-ratio: 2.35; margin: -4px -5.5% 0; }
+.event__logo img { object-position: center 52%; }
+.stage { margin-bottom: 12px; }
+.stage::before { background: radial-gradient(ellipse, #ed8dff26, transparent 68%); }
+.stage__floor {
+  border-color: #ffa742aa;
+  background: radial-gradient(ellipse, #ffd9848a, #9d48bd46 50%, #4a185709 74%);
+  box-shadow: 0 0 25px #fa8c3590, inset 0 0 13px #ffe1a04d;
+}
+.stage__floor::before { border-color: #ffb85a7a; }
+.stage__floor::after { border-color: #ffb65180; }
+.machine img { filter: drop-shadow(0 15px 12px #150421a6); }
+.view[data-view="loading"], .result,
+.view[data-view="ready"], .view[data-view="drawing"] {
+  border: 2px solid #fbd486;
+  border-radius: 25px;
+  background: linear-gradient(145deg, #f8d9ffeb, #d8bcf9e8 55%, #f6dcf6e8);
+  box-shadow: inset 0 2px 0 #fff9, 0 8px 19px #16062565, 0 0 16px #fbaf6b3d;
+}
+.view[data-view="ready"], .view[data-view="drawing"] { padding: 10px; }
+.view[data-view="drawing"] { color: #482464; }
+.card__note { color: #593271; }
+.button, .button--gacha, .button--claim {
+  border-color: #ffe09c;
+  background: radial-gradient(ellipse at 50% 0%, #fff7bc96, transparent 62%),
+    linear-gradient(180deg, #ffcf65 0%, #ff9e2d 48%, #ed6a24 100%);
+  box-shadow: inset 0 2px 1px #fff5c4b8, inset 0 -3px 4px #9f361759,
+    0 6px 0 #7f2b83, 0 9px 15px #17052885;
+  color: #fffdf4; text-shadow: 0 2px 3px #7a235db5;
+}
+.button--gacha::before { background: linear-gradient(180deg, #fff8d8a1, #ffedaf05); }
+.button--gacha[data-action="draw"]:not(:disabled)::after {
+  background: radial-gradient(ellipse at 50% 15%, #fff6bc94, transparent 72%);
+}
+.button:focus-visible, .copy-icon:focus-visible { outline-color: #fff2a9; }
+.result h2 { color: #4b275f; }
+.result p { color: #4f3165; }
+.result--win h2 {
+  color: #e6661b; -webkit-text-stroke: 1px #fff8cf;
+  text-shadow: 0 2px 0 #8f2c58, 0 3px 8px #fb933273;
+}
+.result__points {
+  color: #73208e !important; font-size: clamp(20px, 5.6vw, 25px) !important;
+  -webkit-text-stroke: .65px #fff2bd; text-shadow: 0 2px 5px #ed8c4885;
+}
+.result__reward { border-top-color: #a45d9d5c; }
+.result__code-label { color: #573268 !important; }
+.result__code {
+  border-color: #cf8c53bb; background: #fff3d8bd; color: #4b2468 !important;
+}
+.copy-icon { border-color: #d39172; background: #fff1d6; color: #702c86; }
+.result__help { color: #56346b !important; }
+.page[data-state="win"] .result--win {
+  border: 2px solid #fbd486;
+  background: linear-gradient(150deg, #ffe4f3e8, #d7b7f8ed 55%, #fbe3d7e8);
+  box-shadow: inset 0 2px 0 #fff9, 0 9px 22px #16062570, 0 0 18px #ffa84e45;
+}
+.page[data-state="win"] .result__character { width: min(63%, 190px); max-height: 205px; }
+.page[data-state="win"] .result__character-slot {
+  width: 100%; min-width: 0; height: clamp(125px, 22svh, 185px);
+  min-height: 0; margin: 4px auto 10px;
+}
+.page[data-state="win"] .result__character--win {
+  flex: none; width: min(95vw, 42svh); max-width: none; max-height: none;
+}
+@media (max-width: 599px) {
+  .page { padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom)); }
+  .event { padding: 14px 16px 17px; }
+  .machine { width: min(88%, 290px); }
+  .event__logo { margin-bottom: -3px; }
+}
+@media (min-width: 600px) { .event__logo { width: 100%; margin: -6px auto 1px; } }

@@ -1,8 +1,10 @@
 (function () {
   'use strict';
 
-  // 公開WebアプリURLだけを設定します。確率・コード・抽選条件はGASに置きます。
+  // 公開WebアプリURLとキャンペーンIDだけを設定します。確率・コード・抽選条件はGASに置きます。
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
+  var CAMPAIGN_ID = 'halloween-2026';
+  var PRELAUNCH = true;
   var API_TIMEOUT_MS = 20000;
   var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
@@ -28,7 +30,7 @@
   function celebrateWin() {
     clearConfetti();
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var colors = ['#f4b7d3', '#a8daef', '#fff0ac', '#c3b3ef'];
+    var colors = ['#ffbe4d', '#f78034', '#ffecaa', '#af66eb'];
     var pieces = document.createDocumentFragment();
     for (var i = 0; i < 18; i++) {
       var piece = document.createElement('span');
@@ -53,6 +55,9 @@
       el.hidden = el.getAttribute('data-view') !== view;
     });
   }
+
+  // 見た目のみを先行公開。コード登録・GAS・シート設定の完了後に解除する。
+  if (PRELAUNCH) { show('closed'); return; }
 
   function getDeviceId() {
     var key = 'yokatsu_gacha_device_id';
@@ -91,7 +96,7 @@
         reject(new Error('timeout'));
       }, API_TIMEOUT_MS);
       pending.set(id, { resolve: resolve, reject: reject, timer: timer });
-      bridgeWindow.postMessage({ type: 'yokatsu-request', requestId: id, action: action, deviceId: deviceId }, bridgeOrigin);
+      bridgeWindow.postMessage({ type: 'yokatsu-request', requestId: id, action: action, deviceId: deviceId, campaignId: CAMPAIGN_ID }, bridgeOrigin);
     });
   }
 
@@ -125,11 +130,13 @@
     if (data.status === 'closed') return show('closed');
     if (data.status === 'temporarily_unavailable') return show('unavailable');
     if (data.status === 'win' || data.status === 'lose' || data.status === 'already_played') {
-      var isWin = Number(data.result) === 100 && typeof data.campaignCode === 'string' && data.campaignCode.length > 0;
-      if (Number(data.result) === 100 && !isWin) return show('unavailable');
+      var isWin = Number(data.result) === 20000 &&
+        typeof data.campaignCode === 'string' && /^[A-Za-z0-9]{6}$/.test(data.campaignCode);
+      // この版は20,000ptの全員当選企画専用。想定外の結果を当たりとして見せない。
+      if (!isWin) return show('unavailable');
       root.querySelectorAll('[data-participated]').forEach(function (label) { label.hidden = data.status !== 'already_played'; });
       if (isWin) root.querySelector('[data-code]').textContent = data.campaignCode;
-      show(isWin ? 'win' : 'lose');
+      show('win');
       if (isWin && data.status === 'win') celebrateWin();
       return;
     }
@@ -203,6 +210,6 @@
 
   if (!configured()) { show('unavailable'); return; }
   apiUrl = GAS_WEB_APP_URL;
-  frame.src = apiUrl;
+  frame.src = apiUrl + (apiUrl.indexOf('?') < 0 ? '?' : '&') + 'campaignId=' + encodeURIComponent(CAMPAIGN_ID);
   window.setTimeout(function () { if (!frameReady) show('error'); }, BRIDGE_READY_TIMEOUT_MS);
 }());
