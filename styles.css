@@ -706,3 +706,11 @@ button { -webkit-tap-highlight-color: transparent; }
   :root[data-theme="halloween"] .result--lose .result__lose-message { margin-top: 6px !important; font-size: 15px !important; }
   :root[data-theme="halloween"] .result--lose .result__retry-message { padding-top: 16px; font-size: 14px; }
 }
+
+/* Bring the two Halloween lose captions slightly closer without moving the art. */
+:root[data-theme="halloween"] .result--lose .result__lose-message {
+  transform: translateY(clamp(8px, 2svh, 16px));
+}
+:root[data-theme="halloween"] .result--lose .result__retry-message {
+  transform: translateY(calc(-1 * clamp(8px, 2svh, 16px)));
+}
