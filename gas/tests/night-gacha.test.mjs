@@ -28,6 +28,7 @@ function formatDate(date, timezone, pattern) {
 }
 
 function createSheet(name, rows) {
+  rows = rows.map(row => row.slice());
   return {
     name, rows,
     getName() { return name; },
@@ -69,7 +70,7 @@ function fixture() {
   };
   const properties = { SPREADSHEET_ID: 'test-spreadsheet' };
   const context = vm.createContext({
-    Date, Math, Object, Number, String, console: { error() {} },
+    Date, Math: Object.create(Math), Object, Number, String, console: { error() {} },
     SpreadsheetApp: { getActiveSpreadsheet: () => spreadsheet, openById: id => { assert.equal(id, 'test-spreadsheet'); return spreadsheet; }, flush() {} },
     PropertiesService: { getScriptProperties: () => ({ getProperty: key => properties[key], setProperty: (key, value) => { properties[key] = value; } }) },
     Utilities: { formatDate }, Logger: { log() {} },
@@ -267,6 +268,46 @@ test('setup stops before changing a sheet with a mismatched header', () => {
   const before = JSON.stringify(sheets);
   assert.throws(() => c.setup(), /見出し/);
   assert.equal(JSON.stringify(sheets), before);
+});
+
+
+test('seasonal frontend uses regular sheet rules, code, deduplication and history', () => {
+  const { context: c, sheets } = fixture();
+  const row = sheets['抽選設定'].rows[2];
+  Object.assign(row, { 4: '21:00', 5: '24:00', 6: '2026-10-28', 7: '2026-10-28', 8: '0.85', 9: '100', 10: '100' });
+  sheets['コード管理'].rows[2] = ['night-gacha', '2026-10-28', 'TEST-NORMAL-42', 'ON', ''];
+  const now = new Date('2026-10-28T12:00:00Z');
+  c.Math.random = () => 0.84;
+  assert.equal(c.readCode_('night-gacha', '2026-10-28'), 'TEST-NORMAL-42');
+  assert.equal(c.statusFor_(deviceA, 'night-gacha', now).status, 'ready');
+  const win = c.drawFor_(deviceA, 'night-gacha', 'normal-1', now);
+  assert.equal(win.result, 100);
+  assert.equal(win.campaignCode, 'TEST-NORMAL-42');
+  assert.equal(sheets['ガチャ履歴'].rows[1][3], 'night-gacha');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.length, 1);
+  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'normal-1', now).status, 'already_played');
+  assert.equal(sheets['ガチャ履歴'].rows.length, 2);
+  c.Math.random = () => 0.85;
+  const lose = c.drawFor_(deviceB, 'night-gacha', 'normal-2', now);
+  assert.equal(lose.status, 'lose');
+  assert.equal(lose.result, 0);
+  assert.equal(lose.campaignCode, undefined);
+  assert.equal(c.statusFor_(deviceB, 'night-gacha', new Date('2026-10-28T11:59:00Z')).status, 'already_played');
+});
+
+test('normal lottery keeps schedule and limits despite the Halloween campaign being open', () => {
+  const { context: c, sheets } = fixture();
+  const row = sheets['抽選設定'].rows[2];
+  Object.assign(row, { 4: '21:00', 5: '24:00', 6: '2026-10-28', 7: '2026-10-28', 8: '1', 10: '1' });
+  sheets['コード管理'].rows[2] = ['night-gacha', '2026-10-28', 'TEST-NORMAL-42', 'ON', ''];
+  const now = new Date('2026-10-28T12:00:00Z');
+  assert.equal(c.statusFor_(deviceA, 'night-gacha', new Date('2026-10-28T11:59:59Z')).status, 'closed');
+  assert.equal(c.statusFor_(deviceA, 'night-gacha', now).status, 'ready');
+  assert.equal(c.drawFor_(deviceA, 'night-gacha', 'normal-cap-1', now).result, 100);
+  assert.equal(c.drawFor_(deviceB, 'night-gacha', 'normal-cap-2', now).result, 0);
+  assert.equal(c.statusFor_(deviceB, 'night-gacha', new Date('2026-10-30T12:00:00Z')).status, 'closed');
+  assert.equal(c.statusFor_(deviceB, 'halloween-2026', eventDay).status, 'ready');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows.length, 1);
 });
 
 process.stdout.write(`${checks} focused checks passed\n`);

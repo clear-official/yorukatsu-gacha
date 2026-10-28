@@ -7,8 +7,9 @@
     if (matchMedia('(max-width: 599px)').matches && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
   </script>
   <meta name="theme-color" content="#220d45">
-  <meta name="description" content="10月30日・31日限定の月夜のハロウィンガチャ。大当たりで20,000ptプレゼント！">
-  <title>月夜のハロウィンガチャ</title>
+  <meta name="description" content="水曜日限定の夜活ガチャ。抽選条件は通常の夜活ガチャと共通です。">
+  <title>水曜日限定 夜活ガチャ</title>
+  <script src="theme.js?v=20261028-1"></script>
   <link rel="preconnect" href="https://script.google.com">
   <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
   <link rel="dns-prefetch" href="//script.google.com">
@@ -21,10 +22,10 @@
     gtag('js', new Date());
     gtag('config', 'G-YEXY7TE0FT');
   </script>
-  <link rel="preload" as="image" href="assets/images/halloween-logo.png">
-  <link rel="preload" as="image" href="assets/images/halloween-background.png">
-  <link rel="stylesheet" href="styles.css?v=20261027-15">
-  <script src="app.js?v=20261027-11" defer></script>
+  <link rel="preload" as="image" href="assets/images/yokatsu-gacha-logo.png">
+  <link rel="preload" as="image" href="assets/images/background.png">
+  <link rel="stylesheet" href="styles.css?v=20261028-1">
+  <script src="app.js?v=20261028-1" defer></script>
 </head>
 <body>
   <svg class="filter-definitions" width="0" height="0" aria-hidden="true" focusable="false">
@@ -46,12 +47,12 @@
       <section class="event" aria-labelledby="event-title">
         <p class="demo-banner" data-demo-only hidden>デモ表示：シート記録・ポイント付与なし</p>
         <h1 class="event__logo" id="event-title">
-          <img src="assets/images/halloween-logo.png" alt="月夜のハロウィンガチャ" width="1678" height="937">
+          <img src="assets/images/yokatsu-gacha-logo.png" data-normal-src="assets/images/yokatsu-gacha-logo.png" data-halloween-src="assets/images/halloween-logo.png" alt="水曜日限定 夜活ガチャ" data-normal-alt="水曜日限定 夜活ガチャ" data-halloween-alt="ハロウィン限定 夜活ガチャ">
         </h1>
         <div class="stage">
           <div class="stage__floor" aria-hidden="true"></div>
           <div class="machine" data-machine>
-            <img src="assets/images/halloween-gacha-machine.png" alt="ハロウィン仕様のカプセルが入ったガチャポン" width="1600" height="900">
+            <img src="assets/images/gacha-machine.png" data-normal-src="assets/images/gacha-machine.png" data-halloween-src="assets/images/halloween-gacha-machine.png" alt="カラフルなカプセルが入ったガチャポン" data-normal-alt="カラフルなカプセルが入ったガチャポン" data-halloween-alt="ハロウィン仕様のカプセルが入ったガチャポン">
             <div class="capsule-motion" aria-hidden="true"><i></i><i></i><i></i></div>
           </div>
         </div>
@@ -77,10 +78,17 @@
           </div>
 
           <div class="view" data-view="win" hidden>
-            <p class="result__eyebrow" data-participated hidden>このイベントは参加済みです</p>
+            <p class="result__eyebrow" data-participated hidden>今週は参加済みです</p>
             <section class="result result--win">
-              <h2>大当たり！</h2>
-              <p class="result__points">20,000ptプレゼント✨</p>
+              <img class="win-decor win-decor--star win-decor--star-upper-left" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="win-decor win-decor--star win-decor--star-upper-right" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="win-decor win-decor--star win-decor--star-middle-left" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="win-decor win-decor--star win-decor--star-middle-right" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="win-decor win-decor--star win-decor--star-lower-left" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="win-decor win-decor--star win-decor--star-lower-right" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+
+              <h2>当たり！</h2>
+              <p class="result__points">100ptプレゼント✨</p>
               <div class="result__character-slot">
                 <div class="win-sweets" aria-hidden="true">
                   <img class="win-sweet win-sweet--heart" src="assets/images/halloween-sweet-heart.png" alt="">
@@ -90,7 +98,7 @@
                   <img class="win-sweet win-sweet--cupcake" src="assets/images/halloween-sweet-cupcake.png" alt="">
                   <img class="win-sweet win-sweet--candy-purple" src="assets/images/halloween-sweet-candy-purple.png" alt="">
                 </div>
-                <img class="result__character result__character--win" src="assets/images/halloween-ria-win.png" alt="ハロウィン衣装のリアちゃん" width="1672" height="941">
+                <img class="result__character result__character--win" src="assets/images/ria-win.png" data-normal-src="assets/images/ria-win.png" data-halloween-src="assets/images/halloween-ria-win.png" alt="喜んでいるリアちゃん" data-normal-alt="喜んでいるリアちゃん" data-halloween-alt="ハロウィン衣装のリアちゃん">
               </div>
               <div class="result__reward">
                 <p class="result__code-label" data-code-label>キャンペーンコード</p>
@@ -101,18 +109,31 @@
                   </button>
                 </div>
                 <p class="result__copy-feedback" data-copy-feedback aria-live="polite"></p>
-                <a class="button button--claim" data-demo-block-claim href="https://app-clear.com/open?act=page_contact">ポイントを受け取る</a>
+                <a class="button button--claim" data-demo-block-claim href="https://app-clear.com/open?act=campaign_code">ポイントを受け取る</a>
                 <p class="result__demo-feedback" data-demo-claim-feedback aria-live="polite"></p>
-                <p class="result__help">お問い合わせ窓口でキャンペーンコードをお伝えください。<br>コード確認後ポイントを加算いたします。</p>
+                <p class="result__help">遷移しない場合は、マイページのキャンペーンコード入力からもお受け取りが可能です</p>
               </div>
             </section>
           </div>
 
           <div class="view" data-view="lose" hidden>
-            <p class="result__eyebrow" data-participated hidden>このイベントは参加済みです</p>
+            <p class="result__eyebrow" data-participated hidden>今週は参加済みです</p>
             <section class="result result--lose">
+              <img class="lose-decor lose-decor--moon" src="assets/images/decor-moon.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-upper-left" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-upper-right" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-middle-left" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-middle-right" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-lower-left" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-lower-center" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+              <img class="lose-decor lose-decor--star lose-decor--star-lower-right" src="assets/images/decor-star.png" alt="" aria-hidden="true">
+
               <h2>ざんねん…</h2>
               <div class="result__character-slot">
+                <div class="result__sleep-scene">
+                  <img class="result__character result__character--lose" src="assets/images/ria-lose-sleep.png" alt="おやすみモードのリアちゃん">
+                  <img class="lose-decor--zzz" src="assets/images/decor-zzz.png" alt="" aria-hidden="true">
+                </div>
                 <div class="ghost-scene">
                   <svg class="ghost-scene__smoke ghost-scene__smoke--left" viewBox="0 0 150 220" aria-hidden="true">
                     <path class="ghost-scene__smoke-body" d="M124 37c-23-13-54-5-62 18-6 17 9 28 24 23 15-5 18-20 6-25-8-4-16 1-16 8M133 89c-28-15-70-9-86 20-14 25 1 49 25 49 22 0 31-18 19-31-9-10-25-5-25 7M125 158c15 23-4 46-31 45-19-1-31-12-32-27"/>
@@ -125,11 +146,13 @@
                     <circle cx="41" cy="44" r="4"/><circle cx="26" cy="139" r="5"/><circle cx="116" cy="209" r="3"/>
                   </svg>
                   <span class="ghost-scene__coin" aria-hidden="true">P</span>
-                  <img class="result__character result__character--lose" src="assets/images/halloween-ria-lose.png" alt="おばけ姿のリアちゃん" width="1003" height="1568">
+                  <img class="result__character result__character--lose" src="assets/images/ria-lose-sleep.png" data-normal-src="assets/images/ria-lose-sleep.png" data-halloween-src="assets/images/halloween-ria-lose.png" alt="おやすみモードのリアちゃん" data-normal-alt="おやすみモードのリアちゃん" data-halloween-alt="おばけ姿のリアちゃん">
                   <svg class="ghost-scene__star ghost-scene__star--left" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
                   <svg class="ghost-scene__star ghost-scene__star--lower" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
                 </div>
               </div>
+              <p class="result__sleep-message">今日はおやすみモードかも…🌿</p>
+              <p class="result__message">また来週も参加してみてね</p>
               <p class="result__lose-message">リアちゃんがいたずらして、<br>ポイントを隠しちゃった…💧</p>
             </section>
           </div>

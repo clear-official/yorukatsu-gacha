@@ -3,11 +3,11 @@
 
   // 公開WebアプリURLとキャンペーンIDだけを設定します。確率・コード・抽選条件はGASに置きます。
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
-  var CAMPAIGN_ID = 'halloween-2026';
+  var CAMPAIGN_ID = 'night-gacha';
   var PRELAUNCH = false;
   var demoType = new URLSearchParams(window.location.search).get('demo');
   var DEMO_MODE = demoType === '1' || demoType === 'lose';
-  var DEMO_CODE = 'HW8K2P';
+  var DEMO_CODE = 'DEMO00';
   var API_TIMEOUT_MS = 20000;
   var BRIDGE_READY_TIMEOUT_MS = 20000;
   var root = document.querySelector('[data-app]');
@@ -16,9 +16,6 @@
 
   var frame = root.querySelector('.gas-bridge');
   var eventPanel = root.querySelector('.event');
-  var winCard = root.querySelector('.result--win');
-  var winHelp = winCard.querySelector('.result__help');
-  var claimButton = winCard.querySelector('.button--claim');
   var machine = root.querySelector('[data-machine]');
   var confetti = root.querySelector('[data-confetti]');
   var confettiTimer = 0;
@@ -30,36 +27,17 @@
   var sequence = 0;
   var apiUrl = '';
 
-  function centerWinHelp() {
-    if (window.innerWidth >= 600 || activeView !== 'win') {
-      winHelp.style.removeProperty('--help-offset');
-      return;
-    }
-    winHelp.style.setProperty('--help-offset', '0px');
-    var card = winCard.getBoundingClientRect();
-    var claim = claimButton.getBoundingClientRect();
-    var help = winHelp.getBoundingClientRect();
-    var space = card.bottom - claim.bottom;
-    if (space < help.height + 20) return;
-    var centeredTop = claim.bottom + (space - help.height) / 2;
-    var offset = Math.min(centeredTop - help.top, card.bottom - 12 - help.bottom);
-    winHelp.style.setProperty('--help-offset', Math.max(0, offset).toFixed(2) + 'px');
-  }
-
   function fitGacha() {
-    if (window.innerWidth >= 600 || activeView === 'win' || activeView === 'lose') {
-      root.classList.remove('is-fitted');
-      root.classList.remove('is-booting');
-      root.style.removeProperty('--viewport-height');
-      centerWinHelp();
-      return;
-    }
     var viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
     if (!viewportHeight) return;
     root.style.setProperty('--viewport-height', viewportHeight + 'px');
+    if (window.innerWidth >= 600) {
+      root.classList.remove('is-fitted', 'is-booting');
+      return;
+    }
     root.classList.add('is-fitted');
     var style = window.getComputedStyle(root);
-    var availableHeight = root.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - 1;
+    var availableHeight = viewportHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - 1;
     var panelHeight = eventPanel.offsetHeight;
     if (!panelHeight) return;
     var scale = Math.min(1, Math.max(0, availableHeight / panelHeight));
@@ -75,6 +53,8 @@
     window.requestAnimationFrame(function () { fitQueued = false; fitGacha(); });
   }
   window.addEventListener('resize', queueFit);
+  window.addEventListener('yokatsu-theme-change', queueFit);
+  root.querySelectorAll('img').forEach(function (img) { img.addEventListener('load', queueFit); });
   if (window.visualViewport) window.visualViewport.addEventListener('resize', queueFit);
   if (window.ResizeObserver) new ResizeObserver(queueFit).observe(eventPanel);
   window.addEventListener('pagehide', function () {
@@ -93,7 +73,9 @@
   function celebrateWin() {
     clearConfetti();
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var colors = ['#ffbe4d', '#f78034', '#ffecaa', '#af66eb'];
+    var colors = document.documentElement.getAttribute('data-theme') === 'halloween'
+      ? ['#ffbe4d', '#f78034', '#ffecaa', '#af66eb']
+      : ['#f4b7d3', '#a8daef', '#fff0ac', '#c3b3ef'];
     var pieces = document.createDocumentFragment();
     for (var i = 0; i < 18; i++) {
       var piece = document.createElement('span');
@@ -192,8 +174,8 @@
     if (data.status === 'closed') return show('closed');
     if (data.status === 'temporarily_unavailable') return show('unavailable');
     if (data.status === 'win' || data.status === 'lose' || data.status === 'already_played') {
-      var isWin = data.status !== 'lose' && Number(data.result) === 20000 &&
-        typeof data.campaignCode === 'string' && /^[A-Za-z0-9]{6}$/.test(data.campaignCode);
+      var isWin = data.status !== 'lose' && Number(data.result) === 100 &&
+        typeof data.campaignCode === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{2,63}$/.test(data.campaignCode);
       var isLose = data.status !== 'win' && Number(data.result) === 0 && !data.campaignCode;
       // 想定外の応答は結果として見せない。
       if (!isWin && !isLose) return show('unavailable');
@@ -225,7 +207,7 @@
     var result = DEMO_MODE
       ? Promise.resolve(demoType === 'lose'
         ? { ok: true, status: 'lose', result: 0 }
-        : { ok: true, status: 'win', result: 20000, campaignCode: DEMO_CODE })
+        : { ok: true, status: 'win', result: 100, campaignCode: DEMO_CODE })
       : callApi('draw');
     Promise.all([result, wait(1700)]).then(function (values) {
       machine.classList.remove('is-shaking');
