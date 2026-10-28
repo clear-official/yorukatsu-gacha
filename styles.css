@@ -707,10 +707,11 @@ button { -webkit-tap-highlight-color: transparent; }
   :root[data-theme="halloween"] .result--lose .result__retry-message { padding-top: 16px; font-size: 14px; }
 }
 
-/* Bring the two Halloween lose captions slightly closer without moving the art. */
-:root[data-theme="halloween"] .result--lose .result__lose-message {
-  transform: translateY(clamp(8px, 2svh, 16px));
-}
+/* Match the marked caption areas as proportions of the result card. */
+:root[data-theme="halloween"] .result--lose .result__lose-message,
 :root[data-theme="halloween"] .result--lose .result__retry-message {
-  transform: translateY(calc(-1 * clamp(8px, 2svh, 16px)));
+  position: absolute; left: 18px; right: 18px; margin: 0 !important;
+  padding: 0; transform: translateY(-50%);
 }
+:root[data-theme="halloween"] .result--lose .result__lose-message { top: 73.5%; }
+:root[data-theme="halloween"] .result--lose .result__retry-message { top: 89.5%; }
