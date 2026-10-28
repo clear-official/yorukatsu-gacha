@@ -654,3 +654,55 @@ button { -webkit-tap-highlight-color: transparent; }
   .page[data-state="win"] .result__reward { padding-top: 8px; }
   .page[data-state="win"] .result__code-label { margin-bottom: 4px !important; }
 }
+
+/* Halloween result spacing; the normal edition is intentionally unchanged. */
+.result__retry-message { display: none; }
+:root[data-theme="halloween"] .page[data-state="win"] .result--win {
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto;
+  align-content: start; row-gap: clamp(10px, 1.8svh, 16px);
+  padding: clamp(22px, 4svh, 34px) 18px;
+}
+:root[data-theme="halloween"] .result--win h2,
+:root[data-theme="halloween"] .result--win .result__points { margin: 0 !important; }
+:root[data-theme="halloween"] .page[data-state="win"] .result__character-slot {
+  align-self: center; height: clamp(120px, 29svh, 230px); min-height: 0;
+  max-height: none; margin: 0 auto;
+}
+:root[data-theme="halloween"] .page[data-state="win"] .result__character--win {
+  width: min(100%, 420px); max-height: 100%; height: 100%; object-fit: contain;
+}
+:root[data-theme="halloween"] .result--win .result__reward {
+  display: grid; gap: clamp(10px, 1.7svh, 14px); padding-top: 14px;
+}
+:root[data-theme="halloween"] .result--win .result__code-label,
+:root[data-theme="halloween"] .result--win .result__code-row { margin: 0 !important; }
+:root[data-theme="halloween"] .result--win .result__copy-feedback {
+  display: block; min-height: 16px; margin: -6px 0 !important;
+}
+:root[data-theme="halloween"] .result--win .result__copy-feedback:empty { visibility: hidden; }
+:root[data-theme="halloween"] .result--win .result__help {
+  margin: 8px 0 0 !important; padding: 5px 6px; line-height: 1.65 !important;
+}
+:root[data-theme="halloween"] .page[data-state="lose"] .result--lose {
+  justify-content: flex-start; padding: clamp(26px, 5svh, 42px) 18px clamp(22px, 4svh, 34px);
+}
+:root[data-theme="halloween"] .result--lose h2 { margin: 0 0 12px; }
+:root[data-theme="halloween"] .page[data-state="lose"] .result__character-slot { margin: 10px auto 16px; }
+:root[data-theme="halloween"] .result--lose .result__retry-message {
+  display: block; margin: auto 0 0 !important; padding-top: clamp(22px, 4svh, 34px);
+  color: #5d2c72; font-size: clamp(17px, 4.6vw, 20px); font-weight: 800; line-height: 1.9;
+}
+.result__retry-message span {
+  padding: 0 .12em; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  background: linear-gradient(transparent 63%, #ffe381 63%, #ffe381 94%, transparent 94%);
+}
+@media (max-height: 620px) {
+  :root[data-theme="halloween"] .page[data-state="win"] .result--win { row-gap: 8px; padding: 16px 14px; }
+  :root[data-theme="halloween"] .page[data-state="win"] .result__character-slot { height: 20svh; }
+  :root[data-theme="halloween"] .result--win .result__reward { gap: 10px; padding-top: 10px; }
+  :root[data-theme="halloween"] .result--win .result__help { margin-top: 6px !important; }
+  :root[data-theme="halloween"] .page[data-state="lose"] .result--lose { padding: 18px 14px; }
+  :root[data-theme="halloween"] .page[data-state="lose"] .result__character-slot { height: min(34svh, 210px); margin: 5px auto 8px; }
+  :root[data-theme="halloween"] .result--lose .result__lose-message { margin-top: 6px !important; font-size: 15px !important; }
+  :root[data-theme="halloween"] .result--lose .result__retry-message { padding-top: 16px; font-size: 14px; }
+}
