@@ -27,23 +27,31 @@
   var sequence = 0;
   var apiUrl = '';
 
+  function setLayoutValue(name, value) {
+    if (root.style.getPropertyValue(name) !== value) root.style.setProperty(name, value);
+  }
+
+  function prepareArt(view) {
+    return window.YokatsuTheme ? window.YokatsuTheme.prepare(view) : Promise.resolve();
+  }
+
   function fitGacha() {
     var viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
     if (!viewportHeight) return;
-    root.style.setProperty('--viewport-height', viewportHeight + 'px');
+    setLayoutValue('--viewport-height', viewportHeight + 'px');
     if (window.innerWidth >= 600) {
       root.classList.remove('is-fitted', 'is-booting');
       return;
     }
-    root.classList.add('is-fitted');
+    if (!root.classList.contains('is-fitted')) root.classList.add('is-fitted');
     var style = window.getComputedStyle(root);
     var availableHeight = viewportHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - 1;
     var panelHeight = eventPanel.offsetHeight;
     if (!panelHeight) return;
     var scale = Math.min(1, Math.max(0, availableHeight / panelHeight));
-    root.style.setProperty('--stage-scale', scale.toFixed(5));
-    root.style.setProperty('--stage-height', (panelHeight * scale).toFixed(2) + 'px');
-    root.classList.remove('is-booting');
+    setLayoutValue('--stage-scale', scale.toFixed(5));
+    setLayoutValue('--stage-height', (panelHeight * scale).toFixed(2) + 'px');
+    if (root.classList.contains('is-booting')) root.classList.remove('is-booting');
   }
 
   var fitQueued = false;
@@ -92,6 +100,7 @@
   }
 
   function show(view) {
+    prepareArt(view);
     if (view !== 'win') clearConfetti();
     activeView = view;
     root.setAttribute('data-state', view);
@@ -181,8 +190,12 @@
       if (!isWin && !isLose) return show('unavailable');
       root.querySelectorAll('[data-participated]').forEach(function (label) { label.hidden = data.status !== 'already_played'; });
       root.querySelector('[data-code]').textContent = isWin ? data.campaignCode : '';
-      show(isWin ? 'win' : 'lose');
-      if (isWin && data.status === 'win') celebrateWin();
+      var resultView = isWin ? 'win' : 'lose';
+      // Decode the small result assets before the card appears; never wait forever.
+      Promise.race([prepareArt(resultView), wait(800)]).then(function () {
+        show(resultView);
+        if (isWin && data.status === 'win') celebrateWin();
+      });
       return;
     }
     return show('error');
@@ -199,6 +212,8 @@
 
   function doDraw() {
     if (activeView !== 'ready') return;
+    prepareArt('win');
+    prepareArt('lose');
     show('drawing');
     machine.classList.add('is-shaking');
     window.setTimeout(function () { machine.classList.remove('is-shaking'); }, 1200);
@@ -209,7 +224,7 @@
         ? { ok: true, status: 'lose', result: 0 }
         : { ok: true, status: 'win', result: 100, campaignCode: DEMO_CODE })
       : callApi('draw');
-    Promise.all([result, wait(1700)]).then(function (values) {
+    Promise.all([result, wait(900)]).then(function (values) {
       machine.classList.remove('is-shaking');
       applyResponse(values[0]);
     }).catch(function () {
@@ -266,7 +281,17 @@
     if (action === 'copy') copyCode(button);
   });
 
+  prepareArt('loading');
   fitGacha();
+
+  // Warm only the active theme's result art after the first screen has loaded.
+  function warmResultArt() {
+    var warm = function () { prepareArt('win'); prepareArt('lose'); };
+    if (window.requestIdleCallback) window.requestIdleCallback(warm, { timeout: 1500 });
+    else window.setTimeout(warm, 300);
+  }
+  if (document.readyState === 'complete') warmResultArt();
+  else window.addEventListener('load', warmResultArt, { once: true });
 
   if (DEMO_MODE) {
     root.setAttribute('data-demo', 'true');

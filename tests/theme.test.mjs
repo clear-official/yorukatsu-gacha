@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source = fs.readFileSync(new URL('../theme.js', import.meta.url), 'utf8');
-function fixture(instant) {
+function fixture(instant, lazyResults = false) {
+  let activeView = 'loading';
   let now = Date.parse(instant), timer;
   const events = {}, root = new Map();
   const images = ['logo', 'machine', 'win', 'lose'].map(name => {
@@ -13,12 +14,13 @@ function fixture(instant) {
       ['data-halloween-src', `halloween-${name}`],
       ['data-normal-alt', name], ['data-halloween-alt', `Halloween ${name}`],
     ]);
-    return { getAttribute: key => attrs.has(key) ? attrs.get(key) : null,
+    if (lazyResults && (name === 'win' || name === 'lose')) attrs.delete('src');
+    return { closest: selector => lazyResults && selector === '[data-view]' && (name === 'win' || name === 'lose') ? { getAttribute: () => name } : null, getAttribute: key => attrs.has(key) ? attrs.get(key) : null,
       setAttribute: (key, value) => attrs.set(key, value) };
   });
   const document = {
     documentElement: { getAttribute: key => root.get(key), setAttribute: (key, value) => root.set(key, value) },
-    querySelectorAll: () => images, querySelector: () => null, hidden: false,
+    querySelectorAll: selector => selector.startsWith('link') ? [] : images, querySelector: selector => selector === '[data-app]' ? { getAttribute: () => activeView } : null, hidden: false,
     addEventListener: (event, fn) => { events[event] = fn; },
   };
   const window = {
@@ -29,7 +31,7 @@ function fixture(instant) {
   };
   class Clock extends Date { static now() { return now; } }
   vm.runInNewContext(source, { Date: Clock, document, window, Event: class {} });
-  return { document, images, theme: () => root.get('data-theme'),
+  return { document, images, prepare: window.YokatsuTheme.prepare, setView: value => { activeView = value; }, theme: () => root.get('data-theme'),
     advance(ms) { now += ms; const fn = timer.fn; fn(); },
     resume(instant) { now = Date.parse(instant); events.pageshow(); },
   };
@@ -55,4 +57,18 @@ test('a suspended page resumes with regular assets after the end, without needin
 test('the skin is normal before this one-time season and never recurs the following year', () => {
   assert.equal(fixture('2026-10-27T23:59:59+09:00').theme(), 'normal');
   assert.equal(fixture('2027-10-28T12:00:00+09:00').theme(), 'normal');
+});
+
+
+test('result art is requested only when prepared and still restores the visible result at the boundary', () => {
+  const f = fixture('2026-10-31T23:59:59+09:00', true);
+  assert.equal(f.images[2].getAttribute('src'), null);
+  assert.equal(f.images[3].getAttribute('src'), null);
+  f.prepare('win');
+  f.setView('win');
+  assert.equal(f.images[2].getAttribute('src'), 'halloween-win');
+  assert.equal(f.images[3].getAttribute('src'), null);
+  f.resume('2026-11-01T00:00:00+09:00');
+  assert.equal(f.images[2].getAttribute('src'), 'normal-win');
+  assert.equal(f.images[3].getAttribute('src'), null);
 });

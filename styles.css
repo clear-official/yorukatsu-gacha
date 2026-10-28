@@ -12,7 +12,7 @@ button { -webkit-tap-highlight-color: transparent; }
   position: relative; isolation: isolate; min-height: 100vh; min-height: 100svh;
   padding: calc(24px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
   overflow: hidden;
-  background: radial-gradient(ellipse at 50% 38%, #dee2ff14, transparent 58%), linear-gradient(180deg, #2026520f, #35336806), url("assets/images/background.png") center top / cover no-repeat;
+  background: radial-gradient(ellipse at 50% 38%, #dee2ff14, transparent 58%), linear-gradient(180deg, #2026520f, #35336806), url("assets/images/background.webp") center top / cover no-repeat;
 }
 .page::before, .page::after {
   content: ""; position: absolute; z-index: -1; pointer-events: none; width: 100%; height: 190px; bottom: -70px; border-radius: 50%;
@@ -153,7 +153,7 @@ button { -webkit-tap-highlight-color: transparent; }
 @keyframes zzz-float { 0%,100% { transform: translateY(2px); opacity: .72; } 50% { transform: translateY(-7px); opacity: .95; } }
 @keyframes star-soft { 0%,100% { transform: translateY(2px) scale(.94); opacity: .52; } 50% { transform: translateY(-3px) scale(1.04); opacity: .9; } }
 @keyframes win-star-soft { 0%,100% { transform: translateY(1px) scale(.97); opacity: .76; } 50% { transform: translateY(-2px) scale(1.03); opacity: .96; } }
-.view[data-view="win"]:not([hidden]) .result, .view[data-view="lose"]:not([hidden]) .result { animation: result-appear .35s ease-out both; }
+.view[data-view="win"]:not([hidden]) .result, .view[data-view="lose"]:not([hidden]) .result { animation: result-appear .22s ease-out both; }
 [data-state="win"] .event__logo, [data-state="win"] .stage,
 [data-state="lose"] .event__logo, [data-state="lose"] .stage { display: none; }
 .page[data-state="win"], .page[data-state="lose"] {
@@ -171,7 +171,8 @@ button { -webkit-tap-highlight-color: transparent; }
   padding: clamp(24px, 4.5vh, 38px) 20px;
   overflow: hidden;
   background: linear-gradient(145deg, #f2f1ffad, #cad8efb3);
-  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  /* Static translucent fill avoids re-blurring the full animated backdrop. */
+  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
 .page[data-state="win"] .result--win {
   border: 1px solid #e3e6fb66;
@@ -232,7 +233,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 :root[data-theme="halloween"] .page {
   background: linear-gradient(180deg, #18083112, #320a530b 55%, #16081d26),
-    url("assets/images/halloween-background.png") center top / cover no-repeat;
+    url("assets/images/halloween-background.webp") center top / cover no-repeat;
 }
 
 
@@ -715,3 +716,6 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 :root[data-theme="halloween"] .result--lose .result__lose-message { top: 73.5%; }
 :root[data-theme="halloween"] .result--lose .result__retry-message { top: 89.5%; }
+
+/* Limit compositing hints to the one continuously moving illustration. */
+.machine img { will-change: transform; }
