@@ -119,6 +119,19 @@ test('20,000pt draw is stored once and replays with its code', () => {
   assert.equal(sheets['ハロウィンガチャ履歴'].rows.filter(row => row[7] === 'SUCCESS').length, 1);
 });
 
+test('extending the same event through November keeps October winners already played', () => {
+  const { context: c, sheets } = fixture();
+  sheets['抽選設定'].rows[1][6] = '2026-10-27';
+  sheets['抽選設定'].rows[1][7] = '2026-11-30';
+  sheets['コード管理'].rows[1][1] = '2026-10-27';
+  const first = c.drawFor_(deviceA, 'halloween-2026', 'request-1', new Date('2026-10-27T09:00:00Z'));
+  assert.equal(first.status, 'win');
+  assert.equal(sheets['ハロウィンガチャ履歴'].rows[1][1], '2026-10-27');
+  assert.equal(c.statusFor_(deviceA, 'halloween-2026', new Date('2026-11-02T09:00:00Z')).status, 'already_played');
+  assert.equal(c.statusFor_(deviceB, 'halloween-2026', new Date('2026-11-30T14:59:00Z')).status, 'ready');
+  assert.equal(c.statusFor_(deviceB, 'halloween-2026', new Date('2026-11-30T15:00:00Z')).status, 'closed');
+});
+
 test('another participant wins on day two without a winner limit', () => {
   const { context: c, sheets } = fixture();
   c.drawFor_(deviceA, 'halloween-2026', 'request-1', eventDay);

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ja" data-event="halloween-20000">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    if (matchMedia('(max-width: 599px)').matches && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+  </script>
+  <meta name="theme-color" content="#220d45">
+  <meta name="description" content="月夜のハロウィンガチャ。抽選条件は専用のGoogleシート設定で管理します。">
+  <title>月夜のハロウィンガチャ｜20,000pt</title>
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+  <link rel="dns-prefetch" href="//script.google.com">
+  <link rel="dns-prefetch" href="//script.googleusercontent.com">
+  <!-- Google tag (gtag.js): 夜活ガチャ GitHub Pages 専用 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YEXY7TE0FT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YEXY7TE0FT');
+  </script>
+  <link rel="preload" as="image" fetchpriority="high" data-normal-href="assets/images/yokatsu-gacha-logo.webp" data-halloween-href="assets/images/halloween-logo.webp">
+  <link rel="preload" as="image" fetchpriority="high" data-normal-href="assets/images/background.webp" data-halloween-href="assets/images/halloween-background.webp">
+  <link rel="preload" as="image" fetchpriority="high" data-normal-href="assets/images/gacha-machine.webp" data-halloween-href="assets/images/halloween-gacha-machine.webp">
+  <link rel="stylesheet" href="styles.css?v=20261102-1">
+  <script src="theme.js?v=20261102-1"></script>
+  <script src="app.js?v=20261102-1" defer></script>
+</head>
+<body>
+  <svg class="filter-definitions" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="sweet-sticker-border" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feComponentTransfer in="SourceAlpha" result="sticker-shape"><feFuncA type="linear" slope="40" intercept="-20"/></feComponentTransfer>
+      <feMorphology in="sticker-shape" operator="dilate" radius="1.8" result="border-shape"/>
+      <feFlood flood-color="#d9c0f6" result="border-color"/>
+      <feComposite in="border-color" in2="border-shape" operator="in" result="sticker-border"/>
+      <feGaussianBlur in="border-shape" stdDeviation="1" result="shadow-blur"/>
+      <feOffset in="shadow-blur" dy="1" result="shadow-offset"/>
+      <feFlood flood-color="#30244a" flood-opacity=".18" result="shadow-color"/>
+      <feComposite in="shadow-color" in2="shadow-offset" operator="in" result="sticker-shadow"/>
+      <feMerge><feMergeNode in="sticker-shadow"/><feMergeNode in="sticker-border"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </svg>
+  <main class="page is-booting" data-app data-state="loading">
+    <div class="night-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><b></b><b></b></div>
+    <div class="page__inner">
+      <section class="event" aria-labelledby="event-title">
+        <p class="demo-banner" data-demo-only hidden>デモ表示：シート記録・ポイント付与なし</p>
+        <h1 class="event__logo" id="event-title">
+          <img decoding="async"  data-normal-src="assets/images/yokatsu-gacha-logo.webp" data-halloween-src="assets/images/halloween-logo.webp" alt="月夜のハロウィンガチャ" data-normal-alt="水曜日限定 夜活ガチャ" data-halloween-alt="月夜のハロウィンガチャ" data-normal-width="1672" data-normal-height="941" width="1672" height="941" data-halloween-width="1672" data-halloween-height="941" fetchpriority="high">
+        </h1>
+        <div class="stage">
+          <div class="stage__floor" aria-hidden="true"></div>
+          <div class="machine" data-machine>
+            <img decoding="async"  data-normal-src="assets/images/gacha-machine.webp" data-halloween-src="assets/images/halloween-gacha-machine.webp" alt="カラフルなカプセルが入ったガチャポン" data-normal-alt="カラフルなカプセルが入ったガチャポン" data-halloween-alt="ハロウィン仕様のカプセルが入ったガチャポン" data-normal-width="800" data-normal-height="1200" width="800" height="1200" data-halloween-width="1600" data-halloween-height="900" fetchpriority="high">
+            <div class="capsule-motion" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+
+        <section class="card" aria-live="polite" aria-atomic="true">
+          <div class="confetti" data-confetti aria-hidden="true"></div>
+          <div class="view" data-view="loading">
+            <span class="spinner" aria-hidden="true"></span>
+            <p>参加状況を確認しています…</p>
+          </div>
+
+          <div class="view" data-view="ready" hidden>
+            <button class="button button--gacha" type="button" data-action="draw">
+              <span>ガチャを回す</span>
+            </button>
+          </div>
+
+          <div class="view" data-view="drawing" hidden>
+            <button class="button button--gacha button--busy" type="button" disabled>
+              <span class="spinner spinner--small" aria-hidden="true"></span><span>抽選中…</span>
+            </button>
+            <p class="card__note">そのまま少しお待ちください</p>
+          </div>
+
+          <div class="view" data-view="win" hidden>
+            <p class="result__eyebrow" data-participated hidden>このイベントは参加済みです</p>
+            <section class="result result--win">
+              <img decoding="async" data-theme-only="normal" class="win-decor win-decor--star win-decor--star-upper-left" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="win-decor win-decor--star win-decor--star-upper-right" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="win-decor win-decor--star win-decor--star-middle-left" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="win-decor win-decor--star win-decor--star-middle-right" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="win-decor win-decor--star win-decor--star-lower-left" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="win-decor win-decor--star win-decor--star-lower-right" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+
+              <h2>大当たり！</h2>
+              <p class="result__points">20,000ptプレゼント✨</p>
+              <div class="result__character-slot">
+                <div data-theme-only="halloween" class="win-sweets" aria-hidden="true">
+                  <img decoding="async" class="win-sweet win-sweet--heart" data-src="assets/images/halloween-sweet-heart.webp" alt="" width="1417" height="1110">
+                  <img decoding="async" class="win-sweet win-sweet--lollipop" data-src="assets/images/halloween-sweet-lollipop.webp" alt="" width="1230" height="1278">
+                  <img decoding="async" class="win-sweet win-sweet--candy-orange" data-src="assets/images/halloween-sweet-candy-orange.webp" alt="" width="1536" height="1024">
+                  <img decoding="async" class="win-sweet win-sweet--cookie" data-src="assets/images/halloween-sweet-cookie.webp" alt="" width="1278" height="1230">
+                  <img decoding="async" class="win-sweet win-sweet--cupcake" data-src="assets/images/halloween-sweet-cupcake.webp" alt="" width="1254" height="1254">
+                  <img decoding="async" class="win-sweet win-sweet--candy-purple" data-src="assets/images/halloween-sweet-candy-purple.webp" alt="" width="1536" height="1024">
+                </div>
+                <img decoding="async" class="result__character result__character--win"  data-normal-src="assets/images/ria-win.webp" data-halloween-src="assets/images/halloween-ria-win.webp" alt="喜んでいるリアちゃん" data-normal-alt="喜んでいるリアちゃん" data-halloween-alt="ハロウィン衣装のリアちゃん" data-normal-width="1254" data-normal-height="1254" width="1254" height="1254" data-halloween-width="1672" data-halloween-height="941">
+              </div>
+              <div class="result__reward">
+                <p class="result__code-label" data-code-label>キャンペーンコード</p>
+                <div class="result__code-row">
+                  <p class="result__code" data-code></p>
+                  <button class="copy-icon" type="button" data-action="copy" aria-label="キャンペーンコードをコピー" title="キャンペーンコードをコピー">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 8V5.8A2.8 2.8 0 0 1 10.8 3h7.4A2.8 2.8 0 0 1 21 5.8v7.4a2.8 2.8 0 0 1-2.8 2.8H16v2.2a2.8 2.8 0 0 1-2.8 2.8H5.8A2.8 2.8 0 0 1 3 18.2v-7.4A2.8 2.8 0 0 1 5.8 8H8Zm2 0h3.2a2.8 2.8 0 0 1 2.8 2.8V14h2.2c.44 0 .8-.36.8-.8V5.8a.8.8 0 0 0-.8-.8h-7.4a.8.8 0 0 0-.8.8V8Zm3.2 2H5.8a.8.8 0 0 0-.8.8v7.4c0 .44.36.8.8.8h7.4a.8.8 0 0 0 .8-.8v-7.4a.8.8 0 0 0-.8-.8Z"/></svg>
+                  </button>
+                </div>
+                <p class="result__copy-feedback" data-copy-feedback aria-live="polite"></p>
+                <a class="button button--claim" data-demo-block-claim href="https://app-clear.com/open?act=page_contact">ポイントを受け取る</a>
+                <p class="result__demo-feedback" data-demo-claim-feedback aria-live="polite"></p>
+                <p class="result__help">お問い合わせ窓口でキャンペーンコードをお伝えください。<br>コード確認後ポイントを加算いたします。</p>
+              </div>
+            </section>
+          </div>
+
+          <div class="view" data-view="lose" hidden>
+            <p class="result__eyebrow" data-participated hidden>このイベントは参加済みです</p>
+            <section class="result result--lose">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--moon" data-src="assets/images/decor-moon.webp" alt="" aria-hidden="true" width="456" height="485">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-upper-left" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-upper-right" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-middle-left" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-middle-right" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-lower-left" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-lower-center" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+              <img decoding="async" data-theme-only="normal" class="lose-decor lose-decor--star lose-decor--star-lower-right" data-src="assets/images/decor-star.webp" alt="" aria-hidden="true" width="527" height="514">
+
+              <h2>ざんねん…</h2>
+              <div class="result__character-slot">
+                <div data-theme-only="normal" class="result__sleep-scene">
+                  <img decoding="async" class="result__character result__character--lose" data-src="assets/images/ria-lose-sleep.webp" alt="おやすみモードのリアちゃん" width="1174" height="1148">
+                  <img decoding="async" data-theme-only="normal" class="lose-decor--zzz" data-src="assets/images/decor-zzz.webp" alt="" aria-hidden="true" width="598" height="222">
+                </div>
+                <div data-theme-only="halloween" class="ghost-scene">
+                  <svg class="ghost-scene__smoke ghost-scene__smoke--left" viewBox="0 0 150 220" aria-hidden="true">
+                    <path class="ghost-scene__smoke-body" d="M124 37c-23-13-54-5-62 18-6 17 9 28 24 23 15-5 18-20 6-25-8-4-16 1-16 8M133 89c-28-15-70-9-86 20-14 25 1 49 25 49 22 0 31-18 19-31-9-10-25-5-25 7M125 158c15 23-4 46-31 45-19-1-31-12-32-27"/>
+                    <path class="ghost-scene__smoke-light" d="M112 35c-17-5-34 0-43 13M54 107c-14 17-10 32 0 39M116 171c1 11-10 21-23 22"/>
+                    <circle cx="41" cy="44" r="4"/><circle cx="26" cy="139" r="5"/><circle cx="116" cy="209" r="3"/>
+                  </svg>
+                  <svg class="ghost-scene__smoke ghost-scene__smoke--right" viewBox="0 0 150 220" aria-hidden="true">
+                    <path class="ghost-scene__smoke-body" d="M124 37c-23-13-54-5-62 18-6 17 9 28 24 23 15-5 18-20 6-25-8-4-16 1-16 8M133 89c-28-15-70-9-86 20-14 25 1 49 25 49 22 0 31-18 19-31-9-10-25-5-25 7M125 158c15 23-4 46-31 45-19-1-31-12-32-27"/>
+                    <path class="ghost-scene__smoke-light" d="M112 35c-17-5-34 0-43 13M54 107c-14 17-10 32 0 39M116 171c1 11-10 21-23 22"/>
+                    <circle cx="41" cy="44" r="4"/><circle cx="26" cy="139" r="5"/><circle cx="116" cy="209" r="3"/>
+                  </svg>
+                  <span class="ghost-scene__coin" aria-hidden="true">P</span>
+                  <img decoding="async" class="result__character result__character--lose"  data-normal-src="assets/images/ria-lose-sleep.webp" data-halloween-src="assets/images/halloween-ria-lose.webp" alt="おやすみモードのリアちゃん" data-normal-alt="おやすみモードのリアちゃん" data-halloween-alt="おばけ姿のリアちゃん" data-normal-width="1174" data-normal-height="1148" width="1174" height="1148" data-halloween-width="1003" data-halloween-height="1568">
+                  <svg class="ghost-scene__star ghost-scene__star--left" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
+                  <svg class="ghost-scene__star ghost-scene__star--lower" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 14.8 9.2 22.2 12 14.8 14.8 12 22.2 9.2 14.8 1.8 12 9.2 9.2Z"/></svg>
+                </div>
+              </div>
+              <p class="result__sleep-message">今日はおやすみモードかも…🌿</p>
+              <p class="result__message">また来週も参加してみてね</p>
+              <p class="result__lose-message">リアちゃんがいたずらして、<br>ポイントを隠しちゃった…💧</p>
+              <p class="result__retry-message"><span>また次のイベントで挑戦してみてね🎃</span></p>
+            </section>
+          </div>
+
+          <div class="view" data-view="closed" hidden>
+            <section class="result">
+              <h2>現在は開催時間外です</h2>
+              <p>開催日時になったら、もう一度アクセスしてください</p>
+            </section>
+          </div>
+
+          <div class="view" data-view="unavailable" hidden>
+            <section class="result result--info">
+              <h2>ただいまご利用いただけません</h2>
+              <p>時間をおいて再度お試しください</p>
+              <button class="button button--secondary" type="button" data-action="retry">再度確認する</button>
+            </section>
+          </div>
+
+          <div class="view" data-view="error" hidden>
+            <section class="result result--info">
+              <h2>通信を確認してください</h2>
+              <p>結果を確認できませんでした。通信状態をご確認ください。</p>
+              <button class="button button--secondary" type="button" data-action="retry">参加状況を再確認する</button>
+            </section>
+          </div>
+        </section>
+      </section>
+      <iframe class="gas-bridge" title="抽選サービスとの安全な通信" aria-hidden="true" tabindex="-1"></iframe>
+    </div>
+  </main>
+</body>
+</html>

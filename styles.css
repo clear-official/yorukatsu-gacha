@@ -717,5 +717,13 @@ button { -webkit-tap-highlight-color: transparent; }
 :root[data-theme="halloween"] .result--lose .result__lose-message { top: 73.5%; }
 :root[data-theme="halloween"] .result--lose .result__retry-message { top: 89.5%; }
 
+/* Keep the dedicated event's two claim instructions on one line each at phone widths. */
+@media (max-width: 599px) {
+  :root[data-event="halloween-20000"] .result--win .result__help {
+    width: calc(100% + 24px) !important;
+    margin-left: -12px !important;
+  }
+}
+
 /* Limit compositing hints to the one continuously moving illustration. */
 .machine img { will-change: transform; }

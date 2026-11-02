@@ -4,10 +4,11 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source = fs.readFileSync(new URL('../theme.js', import.meta.url), 'utf8');
-function fixture(instant, lazyResults = false) {
+function fixture(instant, lazyResults = false, dedicatedEvent = false) {
   let activeView = 'loading';
   let now = Date.parse(instant), timer;
   const events = {}, root = new Map();
+  if (dedicatedEvent) root.set('data-event', 'halloween-20000');
   const images = ['logo', 'machine', 'win', 'lose'].map(name => {
     const attrs = new Map([
       ['src', `normal-${name}`], ['data-normal-src', `normal-${name}`],
@@ -57,6 +58,13 @@ test('a suspended page resumes with regular assets after the end, without needin
 test('the skin is normal before this one-time season and never recurs the following year', () => {
   assert.equal(fixture('2026-10-27T23:59:59+09:00').theme(), 'normal');
   assert.equal(fixture('2027-10-28T12:00:00+09:00').theme(), 'normal');
+});
+
+test('the dedicated 20,000pt page keeps Halloween art after the main page returns to normal', () => {
+  const f = fixture('2026-11-02T12:00:00+09:00', false, true);
+  assert.equal(f.theme(), 'halloween');
+  assert(f.images.every(i => i.getAttribute('src').startsWith('halloween-')));
+  assert.equal(f.document.title, '月夜のハロウィンガチャ｜20,000pt');
 });
 
 

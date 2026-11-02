@@ -3,7 +3,9 @@
 
   // 公開WebアプリURLとキャンペーンIDだけを設定します。確率・コード・抽選条件はGASに置きます。
   var GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCbbOyCLhaORCh-NIt2co7FOSdwYAYxvAxvUVLIUP0eBTMHL0uIZbyFyrJJKjyfU0b/exec';
-  var CAMPAIGN_ID = 'night-gacha';
+  var DEDICATED_HALLOWEEN = document.documentElement.getAttribute('data-event') === 'halloween-20000';
+  var CAMPAIGN_ID = DEDICATED_HALLOWEEN ? 'halloween-2026' : 'night-gacha';
+  var EXPECTED_POINTS = DEDICATED_HALLOWEEN ? 20000 : 100;
   var PRELAUNCH = false;
   var demoType = new URLSearchParams(window.location.search).get('demo');
   var DEMO_MODE = demoType === '1' || demoType === 'lose';
@@ -183,7 +185,7 @@
     if (data.status === 'closed') return show('closed');
     if (data.status === 'temporarily_unavailable') return show('unavailable');
     if (data.status === 'win' || data.status === 'lose' || data.status === 'already_played') {
-      var isWin = data.status !== 'lose' && Number(data.result) === 100 &&
+      var isWin = data.status !== 'lose' && Number(data.result) === EXPECTED_POINTS &&
         typeof data.campaignCode === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{2,63}$/.test(data.campaignCode);
       var isLose = data.status !== 'win' && Number(data.result) === 0 && !data.campaignCode;
       // 想定外の応答は結果として見せない。
@@ -222,7 +224,7 @@
     var result = DEMO_MODE
       ? Promise.resolve(demoType === 'lose'
         ? { ok: true, status: 'lose', result: 0 }
-        : { ok: true, status: 'win', result: 100, campaignCode: DEMO_CODE })
+        : { ok: true, status: 'win', result: EXPECTED_POINTS, campaignCode: DEMO_CODE })
       : callApi('draw');
     Promise.all([result, wait(900)]).then(function (values) {
       machine.classList.remove('is-shaking');
